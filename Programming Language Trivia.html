@@ -1,0 +1,3034 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Quest: Programming Language Trivia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+        
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6366f1, #8b5cf6, #d946ef);
+            --secondary-gradient: linear-gradient(135deg, #3b82f6, #2dd4bf);
+            --card-bg: #1e1e2e;
+            --bg-color: #0f0f1a;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: #f8fafc;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(217, 70, 239, 0.08) 0%, transparent 25%);
+        }
+        
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .quiz-card {
+            background-color: var(--card-bg);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .option-btn {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .option-btn:hover:not(.disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .option-btn.correct {
+            background: linear-gradient(90deg, rgba(5, 150, 105, 0.5), rgba(5, 150, 105, 0.8));
+            border-color: #059669;
+        }
+        
+        .option-btn.incorrect {
+            background: linear-gradient(90deg, rgba(220, 38, 38, 0.5), rgba(220, 38, 38, 0.8));
+            border-color: #dc2626;
+        }
+        
+        .option-btn.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            transition: width 0.5s ease;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .badge {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .badge::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(60deg, 
+                rgba(255,255,255,0) 20%, 
+                rgba(255,255,255,0.1) 30%, 
+                rgba(255,255,255,0) 40%);
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { left: -50%; }
+            100% { left: 100%; }
+        }
+        
+        .animate-bounce-in {
+            animation: bounceIn 0.5s;
+        }
+        
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            70% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+        }
+        
+        .language-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 20px;
+            margin-right: 12px;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-gradient {
+            background: var(--primary-gradient);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-gradient:hover {
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .achievement-badge {
+            position: relative;
+        }
+        
+        .achievement-badge::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 16px;
+            padding: 2px;
+            background: var(--primary-gradient);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 0.1em 0.3em;
+            border-radius: 0.2em;
+            font-size: 0.9em;
+        }
+        
+        .language-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .language-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .language-card.selected {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+        }
+        
+        .badge-earned {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .badge-earned:hover {
+            transform: scale(1.05);
+        }
+        
+        .badge-locked {
+            filter: grayscale(1);
+            opacity: 0.5;
+        }
+        
+        .badge-glow {
+            animation: badgeGlow 2s infinite alternate;
+        }
+        
+        @keyframes badgeGlow {
+            from {
+                box-shadow: 0 0 5px rgba(139, 92, 246, 0.5);
+            }
+            to {
+                box-shadow: 0 0 20px rgba(139, 92, 246, 0.8);
+            }
+        }
+        
+        .certificate {
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%239C92AC' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E"),
+                linear-gradient(135deg, #1e1e2e, #2d2d3f);
+            border: 2px solid gold;
+        }
+        
+        .certificate-seal {
+            position: absolute;
+            bottom: 20px;
+            right: 30px;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #ffd700, #b8860b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            font-size: 24px;
+        }
+        
+        .certificate-ribbon {
+            position: absolute;
+            top: 0;
+            right: 30px;
+            width: 30px;
+            height: 60px;
+            background: #d946ef;
+            transform: translateY(-15px);
+        }
+        
+        .certificate-ribbon::before,
+        .certificate-ribbon::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+        
+        .certificate-ribbon::before {
+            left: 0;
+            border-width: 15px 0 0 15px;
+            border-color: transparent transparent transparent #a21caf;
+        }
+        
+        .certificate-ribbon::after {
+            right: 0;
+            border-width: 15px 15px 0 0;
+            border-color: transparent #a21caf transparent transparent;
+        }
+        
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        
+        .tab-button.active {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .footer {
+            margin-top: auto;
+            padding: 1rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .footer a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            color: white;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-5xl mx-auto">
+        <!-- Start Screen -->
+        <div id="start-screen" class="quiz-card p-8 text-center animate-bounce-in">
+            <div class="mb-6 floating">
+                <svg class="mx-auto w-24 h-24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="48" stroke="url(#paint0_linear)" stroke-width="4"/>
+                    <path d="M30 65L45 35L55 35L70 65" stroke="url(#paint1_linear)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M35 55H65" stroke="url(#paint2_linear)" stroke-width="6" stroke-linecap="round"/>
+                    <defs>
+                        <linearGradient id="paint0_linear" x1="10" y1="10" x2="90" y2="90" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#6366F1"/>
+                            <stop offset="0.5" stop-color="#8B5CF6"/>
+                            <stop offset="1" stop-color="#D946EF"/>
+                        </linearGradient>
+                        <linearGradient id="paint1_linear" x1="30" y1="50" x2="70" y2="50" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#6366F1"/>
+                            <stop offset="1" stop-color="#D946EF"/>
+                        </linearGradient>
+                        <linearGradient id="paint2_linear" x1="35" y1="55" x2="65" y2="55" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#6366F1"/>
+                            <stop offset="1" stop-color="#D946EF"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 glow-text">Code Quest</h1>
+            <p class="text-xl mb-8 text-gray-300">Test your knowledge of programming languages!</p>
+            
+            <div class="flex justify-center mb-8">
+                <div class="flex space-x-2">
+                    <button class="tab-button active px-4 py-2 rounded-lg" data-tab="home">Home</button>
+                    <button class="tab-button px-4 py-2 rounded-lg" data-tab="languages">Languages</button>
+                    <button class="tab-button px-4 py-2 rounded-lg" data-tab="badges">My Badges</button>
+                </div>
+            </div>
+            
+            <div id="home-tab" class="tab-content">
+                <div class="flex flex-wrap justify-center gap-3 mb-10">
+                    <div class="badge glass-effect px-4 py-2 rounded-full">
+                        <span class="code-font text-blue-400">Python</span>
+                    </div>
+                    <div class="badge glass-effect px-4 py-2 rounded-full">
+                        <span class="code-font text-yellow-400">JavaScript</span>
+                    </div>
+                    <div class="badge glass-effect px-4 py-2 rounded-full">
+                        <span class="code-font text-purple-400">C#</span>
+                    </div>
+                    <div class="badge glass-effect px-4 py-2 rounded-full">
+                        <span class="code-font text-orange-400">Java</span>
+                    </div>
+                    <div class="badge glass-effect px-4 py-2 rounded-full">
+                        <span class="code-font text-green-400">Go</span>
+                    </div>
+                    <div class="badge glass-effect px-4 py-2 rounded-full">
+                        <span class="code-font text-red-400">PHP</span>
+                    </div>
+                    <div class="badge glass-effect px-4 py-2 rounded-full">
+                        <span class="code-font text-cyan-400">SQL</span>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center mb-10">
+                    <div class="glass-effect p-4 rounded-xl text-center">
+                        <div class="text-2xl font-bold text-purple-400 mb-1">10</div>
+                        <div class="text-sm text-gray-400">Questions per Quiz</div>
+                    </div>
+                    <div class="glass-effect p-4 rounded-xl text-center">
+                        <div class="text-2xl font-bold text-blue-400 mb-1">13</div>
+                        <div class="text-sm text-gray-400">Languages</div>
+                    </div>
+                    <div class="glass-effect p-4 rounded-xl text-center">
+                        <div id="badges-count" class="text-2xl font-bold text-pink-400 mb-1">0</div>
+                        <div class="text-sm text-gray-400">Badges Earned</div>
+                    </div>
+                </div>
+                
+                <button id="start-btn" class="btn-gradient text-white font-bold py-3 px-10 rounded-xl text-xl shadow-lg">
+                    Choose a Language
+                </button>
+            </div>
+            
+            <div id="languages-tab" class="tab-content hidden">
+                <h2 class="text-2xl font-bold mb-6">Select a Language</h2>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                    <!-- Language cards will be inserted here -->
+                </div>
+                
+                <button id="start-quiz-btn" class="btn-gradient text-white font-bold py-3 px-10 rounded-xl text-xl shadow-lg opacity-50 cursor-not-allowed" disabled>
+                    Start Quiz
+                </button>
+            </div>
+            
+            <div id="badges-tab" class="tab-content hidden">
+                <h2 class="text-2xl font-bold mb-6">My Badges</h2>
+                
+                <div id="badges-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-8">
+                    <!-- Badges will be inserted here -->
+                </div>
+                
+                <div id="master-badge-container" class="hidden">
+                    <h3 class="text-xl font-bold mb-4 text-yellow-400">Master Achievement</h3>
+                    <div class="certificate p-6 rounded-xl relative mb-4">
+                        <div class="certificate-ribbon"></div>
+                        <h2 class="text-2xl font-bold mb-2 text-center text-yellow-300">Certificate of Achievement</h2>
+                        <p class="text-center mb-4 text-gray-300">This certifies that</p>
+                        <p class="text-xl font-bold text-center mb-4">Code Master</p>
+                        <p class="text-center mb-6 text-gray-300">has demonstrated exceptional knowledge in all programming languages</p>
+                        <p class="text-center text-sm text-gray-400">Awarded on <span id="certificate-date"></span></p>
+                        <div class="certificate-seal">🏆</div>
+                    </div>
+                </div>
+                
+                <button class="back-to-home-btn px-6 py-2 rounded-lg border border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white transition-all">
+                    Back to Home
+                </button>
+            </div>
+        </div>
+        
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden">
+            <div class="flex justify-between items-center mb-4">
+                <div class="glass-effect px-4 py-2 rounded-lg text-gray-300">
+                    <span id="current-language" class="font-bold text-white">Language</span> • Question <span id="current-question" class="font-bold text-white">1</span>/<span id="total-questions">10</span>
+                </div>
+                <div class="glass-effect px-4 py-2 rounded-lg">
+                    Score: <span id="score" class="font-bold glow-text">0</span>
+                </div>
+            </div>
+            
+            <div class="progress-bar mb-6">
+                <div class="progress-fill" style="width: 10%;"></div>
+            </div>
+            
+            <div class="quiz-card p-6 md:p-8 animate-bounce-in">
+                <div id="question-container" class="mb-6">
+                    <h2 id="question" class="text-xl md:text-2xl font-semibold"></h2>
+                </div>
+                
+                <div id="options" class="space-y-3 mb-6">
+                    <!-- Options will be inserted here -->
+                </div>
+                
+                <div id="feedback" class="hidden mb-6 p-4 rounded-lg"></div>
+                
+                <button id="next-btn" class="hidden w-full btn-gradient text-white font-bold py-3 px-6 rounded-lg">
+                    Next Question
+                </button>
+            </div>
+        </div>
+        
+        <!-- Results Screen -->
+        <div id="results-screen" class="hidden quiz-card p-8 text-center animate-bounce-in">
+            <h2 class="text-3xl font-bold mb-2 glow-text">Quiz Complete!</h2>
+            <p id="results-language" class="text-xl mb-6 text-gray-300">Your final score:</p>
+            
+            <div class="text-5xl font-bold mb-8 glow-text">
+                <span id="final-score">0</span>/<span id="max-score">0</span>
+            </div>
+            
+            <div id="achievement" class="mb-10">
+                <!-- Achievement badge will be inserted here -->
+            </div>
+            
+            <div id="badge-earned-container" class="hidden mb-10">
+                <h3 class="text-xl font-bold mb-4 text-purple-400">Badge Earned!</h3>
+                <div id="badge-earned" class="inline-block"></div>
+            </div>
+            
+            <div id="master-achievement-container" class="hidden mb-10">
+                <h3 class="text-xl font-bold mb-4 text-yellow-400">Master Achievement Unlocked!</h3>
+                <p class="text-gray-300 mb-4">Congratulations! You've earned all language badges!</p>
+                <button id="view-certificate-btn" class="px-6 py-2 rounded-lg bg-yellow-600 text-white hover:bg-yellow-500 transition-all">
+                    View Certificate
+                </button>
+            </div>
+            
+            <div class="flex flex-wrap justify-center gap-4">
+                <button id="retry-btn" class="px-6 py-2 rounded-lg border border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white transition-all">
+                    Retry Quiz
+                </button>
+                <button id="choose-language-btn" class="px-6 py-2 rounded-lg border border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white transition-all">
+                    Choose Another Language
+                </button>
+                <button id="view-badges-btn" class="px-6 py-2 rounded-lg border border-pink-500 text-pink-400 hover:bg-pink-500 hover:text-white transition-all">
+                    View My Badges
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer mt-6 rounded-lg">
+        <div class="container mx-auto flex flex-col md:flex-row justify-center items-center text-center md:text-left">
+            <p class="mr-2">
+                <a href="https://www.aaronshi.cc" target="_blank" rel="noopener noreferrer" class="flex items-center hover:text-white transition duration-300">
+                    Go to AaronShi.cc
+                </a>
+            </p>
+            <span class="mx-2 hidden md:inline">|</span>
+            <a href="https://app.aaronshi.cc" target="_blank" rel="noopener noreferrer" class="flex items-center hover:text-white transition duration-300">
+                Back to AaronShi.cc App
+            </a>
+        </div>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM Elements
+            const startScreen = document.getElementById('start-screen');
+            const quizScreen = document.getElementById('quiz-screen');
+            const resultsScreen = document.getElementById('results-screen');
+            const startBtn = document.getElementById('start-btn');
+            const startQuizBtn = document.getElementById('start-quiz-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const retryBtn = document.getElementById('retry-btn');
+            const chooseLanguageBtn = document.getElementById('choose-language-btn');
+            const viewBadgesBtn = document.getElementById('view-badges-btn');
+            const viewCertificateBtn = document.getElementById('view-certificate-btn');
+            const questionEl = document.getElementById('question');
+            const questionContainer = document.getElementById('question-container');
+            const optionsEl = document.getElementById('options');
+            const feedbackEl = document.getElementById('feedback');
+            const currentQuestionEl = document.getElementById('current-question');
+            const totalQuestionsEl = document.getElementById('total-questions');
+            const scoreEl = document.getElementById('score');
+            const finalScoreEl = document.getElementById('final-score');
+            const maxScoreEl = document.getElementById('max-score');
+            const progressFill = document.querySelector('.progress-fill');
+            const achievementEl = document.getElementById('achievement');
+            const badgeEarnedContainer = document.getElementById('badge-earned-container');
+            const badgeEarned = document.getElementById('badge-earned');
+            const masterAchievementContainer = document.getElementById('master-achievement-container');
+            const currentLanguageEl = document.getElementById('current-language');
+            const resultsLanguageEl = document.getElementById('results-language');
+            const badgesCountEl = document.getElementById('badges-count');
+            const certificateDateEl = document.getElementById('certificate-date');
+            
+            // Tab navigation
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const languagesTab = document.getElementById('languages-tab');
+            const badgesTab = document.getElementById('badges-tab');
+            const homeTab = document.getElementById('home-tab');
+            const backToHomeButtons = document.querySelectorAll('.back-to-home-btn');
+            
+            // Quiz state
+            let currentQuestion = 0;
+            let score = 0;
+            let selectedQuestions = [];
+            let selectedLanguage = null;
+            const questionsPerGame = 10;
+            
+            // Language icons and colors for questions and badges
+            const languageIcons = {
+                'C': { emoji: '🔍', color: 'bg-blue-500', textColor: 'text-blue-500', gradient: 'from-blue-400 to-blue-600' },
+                'C++': { emoji: '🔧', color: 'bg-blue-600', textColor: 'text-blue-600', gradient: 'from-blue-500 to-blue-700' },
+                'C#': { emoji: '🔮', color: 'bg-purple-600', textColor: 'text-purple-600', gradient: 'from-purple-500 to-purple-700' },
+                'Java': { emoji: '☕', color: 'bg-orange-600', textColor: 'text-orange-600', gradient: 'from-orange-500 to-orange-700' },
+                'JavaScript': { emoji: '🟨', color: 'bg-yellow-500', textColor: 'text-yellow-500', gradient: 'from-yellow-400 to-yellow-600' },
+                'Python': { emoji: '🐍', color: 'bg-blue-500', textColor: 'text-blue-500', gradient: 'from-blue-400 to-blue-600' },
+                'PHP': { emoji: '🐘', color: 'bg-indigo-600', textColor: 'text-indigo-600', gradient: 'from-indigo-500 to-indigo-700' },
+                'SQL': { emoji: '🗄️', color: 'bg-cyan-600', textColor: 'text-cyan-600', gradient: 'from-cyan-500 to-cyan-700' },
+                'Go': { emoji: '🐹', color: 'bg-blue-400', textColor: 'text-blue-400', gradient: 'from-blue-300 to-blue-500' },
+                'Swift': { emoji: '🦅', color: 'bg-orange-500', textColor: 'text-orange-500', gradient: 'from-orange-400 to-orange-600' },
+                'Visual Basic': { emoji: '🔷', color: 'bg-blue-700', textColor: 'text-blue-700', gradient: 'from-blue-600 to-blue-800' },
+                'Scratch': { emoji: '🐱', color: 'bg-orange-500', textColor: 'text-orange-500', gradient: 'from-orange-400 to-orange-600' },
+                'TypeScript': { emoji: '🔵', color: 'bg-blue-500', textColor: 'text-blue-500', gradient: 'from-blue-400 to-blue-600' },
+                'General': { emoji: '💻', color: 'bg-gray-600', textColor: 'text-gray-600', gradient: 'from-gray-500 to-gray-700' }
+            };
+            
+            // Full question bank
+            const questionBank = [
+                {
+                    question: "Who created Python?",
+                    options: ["Guido van Rossum", "James Gosling", "Bjarne Stroustrup", "Brendan Eich"],
+                    answer: 0,
+                    explanation: "Python was created by Guido van Rossum and first released in 1991. He's often referred to as Python's 'Benevolent Dictator For Life' (BDFL).",
+                    language: "Python"
+                },
+                {
+                    question: "What type of programming language is Python?",
+                    options: ["Compiled", "Low-level", "Interpreted", "Machine language"],
+                    answer: 2,
+                    explanation: "Python is an interpreted language, meaning the code is executed line by line by an interpreter.",
+                    language: "Python"
+                },
+                {
+                    question: "Which keyword is used to define a function in Python?",
+                    options: ["func", "def", "function", "define"],
+                    answer: 1,
+                    explanation: "The 'def' keyword is used in Python to define a function.",
+                    language: "Python"
+                },
+                {
+                    question: "Which symbol is used for comments in Python?",
+                    options: ["//", "#", "/* */", "<!-- -->"],
+                    answer: 1,
+                    explanation: "Python uses the hash symbol '#' for single-line comments.",
+                    language: "Python"
+                },
+                {
+                    question: "What is the output of type(5)?",
+                    options: ["int", "float", "number", "integer"],
+                    answer: 0,
+                    explanation: "The type() function returns 'int' when given an integer like 5.",
+                    language: "Python"
+                },
+                {
+                    question: "Which data type is immutable in Python?",
+                    options: ["List", "Dictionary", "Set", "Tuple"],
+                    answer: 3,
+                    explanation: "Tuples are immutable in Python, meaning their contents cannot be changed after creation.",
+                    language: "Python"
+                },
+                {
+                    question: "How do you start a block of code in Python?",
+                    options: ["Braces {}", "Semicolons ;", "Parentheses ()", "Indentation"],
+                    answer: 3,
+                    explanation: "Python uses indentation (whitespace) to define blocks of code.",
+                    language: "Python"
+                },
+                {
+                    question: "Which function is used to get user input in Python?",
+                    options: ["get()", "input()", "scan()", "readline()"],
+                    answer: 1,
+                    explanation: "The input() function allows the user to input text from the keyboard.",
+                    language: "Python"
+                },
+                {
+                    question: "What will 'Hello' * 3 return in Python?",
+                    options: ["Error", "HelloHelloHello", "Hello3", "3Hello"],
+                    answer: 1,
+                    explanation: "The '*' operator repeats the string 'Hello' three times, resulting in 'HelloHelloHello'.",
+                    language: "Python"
+                },
+                {
+                    question: "Which of the following is a Python boolean value?",
+                    options: ["yes", "TRUE", "true", "True"],
+                    answer: 3,
+                    explanation: "Python uses 'True' (capital T) as a boolean value.",
+                    language: "Python"
+                },
+                {
+                    question: "How are Python lists defined?",
+                    options: ["Using ()", "Using {}", "Using []", "Using <>"],
+                    answer: 2,
+                    explanation: "Python lists are defined using square brackets [].",
+                    language: "Python"
+                },
+                {
+                    question: "Which keyword is used for a loop in Python?",
+                    options: ["repeat", "for", "loop", "iterate"],
+                    answer: 1,
+                    explanation: "The 'for' keyword is used for looping in Python.",
+                    language: "Python"
+                },
+                {
+                    question: "Which module is used to work with regular expressions in Python?",
+                    options: ["regex", "pyregex", "re", "pattern"],
+                    answer: 2,
+                    explanation: "The 're' module provides support for regular expressions in Python.",
+                    language: "Python"
+                },
+                {
+                    question: "What is the result of 3 == '3' in Python?",
+                    options: ["True", "False", "Error", "None"],
+                    answer: 1,
+                    explanation: "Python uses strict type comparison, so an integer 3 is not equal to a string '3'.",
+                    language: "Python"
+                },
+                {
+                    question: "What does the 'len()' function do in Python?",
+                    options: ["Counts elements", "Measures memory", "Returns type", "Calculates sum"],
+                    answer: 0,
+                    explanation: "The len() function returns the number of items in an object like a list or string.",
+                    language: "Python"
+                },
+                {
+                    question: "Which statement is used to handle exceptions in Python?",
+                    options: ["try/except", "catch", "handle", "rescue"],
+                    answer: 0,
+                    explanation: "Python uses the try/except block to handle exceptions.",
+                    language: "Python"
+                },
+                {
+                    question: "What is a lambda function in Python?",
+                    options: ["A function with no return", "A type of variable", "An anonymous function", "A recursive call"],
+                    answer: 2,
+                    explanation: "A lambda function is a small anonymous function defined with the 'lambda' keyword.",
+                    language: "Python"
+                },
+                {
+                    question: "Which built-in data type in Python is a key-value pair?",
+                    options: ["List", "Tuple", "Dictionary", "Set"],
+                    answer: 2,
+                    explanation: "A dictionary stores data in key-value pairs and is defined using curly braces {}.",
+                    language: "Python"
+                },
+                {
+                    question: "What is the default return value of a function in Python if no return statement is used?",
+                    options: ["0", "False", "None", "Empty string"],
+                    answer: 2,
+                    explanation: "If a function does not explicitly return a value, Python returns 'None' by default.",
+                    language: "Python"
+                },
+                {
+                    question: "Which of these is used to install external Python packages?",
+                    options: ["apt", "npm", "pip", "brew"],
+                    answer: 2,
+                    explanation: "'pip' is the package installer for Python, used to install libraries and tools.",
+                    language: "Python"
+                },
+                {
+                    question: "What does the 'this' keyword refer to in JavaScript?",
+                    options: ["The current function", "The parent function", "The execution context", "The global window object"],
+                    answer: 2,
+                    explanation: "In JavaScript, 'this' refers to the execution context, which depends on how a function is called. It can refer to different objects depending on the context.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "Which company developed JavaScript?",
+                    options: ["Microsoft", "Sun Microsystems", "Netscape", "Oracle"],
+                    answer: 2,
+                    explanation: "JavaScript was developed by Netscape, primarily by Brendan Eich, in the mid-1990s.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "What is the file extension for JavaScript files?",
+                    options: [".js", ".java", ".jv", ".jsx"],
+                    answer: 0,
+                    explanation: "JavaScript files commonly use the '.js' file extension.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "Which HTML element is used to embed JavaScript code?",
+                    options: ["<code>", "<script>", "<js>", "<embed>"],
+                    answer: 1,
+                    explanation: "The <script> tag is used to embed or reference JavaScript code in HTML.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "What is the result of 'typeof null' in JavaScript?",
+                    options: ["'null'", "'undefined'", "'object'", "'number'"],
+                    answer: 2,
+                    explanation: "Due to a historical bug, 'typeof null' returns 'object' in JavaScript.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "Which keyword is used to define a constant in JavaScript?",
+                    options: ["let", "var", "const", "define"],
+                    answer: 2,
+                    explanation: "The 'const' keyword is used to declare a constant value in JavaScript.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "Which JavaScript method is used to parse a JSON string?",
+                    options: ["JSON.decode()", "JSON.parse()", "JSON.stringify()", "JSON.read()"],
+                    answer: 1,
+                    explanation: "JSON.parse() converts a JSON string into a JavaScript object.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "Which method is used to write content to the web page in JavaScript?",
+                    options: ["console.log()", "window.alert()", "document.write()", "innerText()"],
+                    answer: 2,
+                    explanation: "document.write() writes content directly to the HTML document.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "What is a closure in JavaScript?",
+                    options: ["A function that returns itself", "A function having access to its own scope and the outer scope", "A private variable", "A class inside another class"],
+                    answer: 1,
+                    explanation: "A closure is a function that has access to variables from its outer function, even after the outer function has returned.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "What will '2' + 2 evaluate to in JavaScript?",
+                    options: ["4", "22", "'4'", "'2 + 2'"],
+                    answer: 1,
+                    explanation: "The string '2' and the number 2 will concatenate in JavaScript, resulting in the string '22'.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "What is the difference between '==' and '===' in JavaScript?",
+                    options: ["No difference", "'===' checks value and type", "'==' is stricter", "'===' is for strings only"],
+                    answer: 1,
+                    explanation: "'===' checks both value and type, while '==' performs type coercion.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "Which of the following is not a JavaScript data type?",
+                    options: ["Number", "String", "Float", "Boolean"],
+                    answer: 2,
+                    explanation: "JavaScript does not have a distinct 'Float' type; all numbers are floating point.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "What is the purpose of the 'use strict' directive?",
+                    options: ["It enables debugging mode", "It prevents variable hoisting", "It enforces stricter parsing and error handling", "It blocks async operations"],
+                    answer: 2,
+                    explanation: "'use strict' enables strict mode which helps catch common coding mistakes and unsafe actions.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "What does 'NaN' stand for in JavaScript?",
+                    options: ["Not a Name", "Null and None", "Not a Number", "New and Null"],
+                    answer: 2,
+                    explanation: "'NaN' stands for 'Not a Number' and represents a computational error.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "Which array method adds a new element to the end of an array?",
+                    options: ["push()", "pop()", "shift()", "concat()"],
+                    answer: 0,
+                    explanation: "The push() method adds a new element to the end of an array.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "How do you write a single-line comment in JavaScript?",
+                    options: ["<!-- comment -->", "/* comment */", "// comment", "# comment"],
+                    answer: 2,
+                    explanation: "// is used to write single-line comments in JavaScript.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "What does the 'async' keyword do in JavaScript?",
+                    options: ["Makes code synchronous", "Defines a function that returns a Promise", "Pauses execution", "Runs code in a new thread"],
+                    answer: 1,
+                    explanation: "'async' defines a function that automatically returns a Promise, allowing the use of 'await'.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "Which operator is used to check if two values are not equal in value or type?",
+                    options: ["!=", "!==", "==!", "<>"],
+                    answer: 1,
+                    explanation: "!== checks both value and type inequality.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "Which method converts a JavaScript object to a JSON string?",
+                    options: ["JSON.convert()", "JSON.stringify()", "JSON.encode()", "object.toJSON()"],
+                    answer: 1,
+                    explanation: "JSON.stringify() converts a JavaScript object into a JSON string.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "What is the global object in JavaScript running in a browser?",
+                    options: ["global", "window", "document", "this"],
+                    answer: 1,
+                    explanation: "In browsers, the 'window' object is the global object that holds global variables and functions.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "Which company developed C#?",
+                    options: ["Apple", "Microsoft", "Google", "Oracle"],
+                    answer: 1,
+                    explanation: "C# was developed by Microsoft as part of its .NET initiative. It was designed by Anders Hejlsberg and his team.",
+                    language: "C#"
+                },
+                {
+                    question: "What programming paradigm is primarily supported by C#?",
+                    options: ["Object-oriented", "Procedural", "Functional", "Logic-based"],
+                    answer: 0,
+                    explanation: "C# is primarily an object-oriented language but also supports procedural and functional programming.",
+                    language: "C#"
+                },
+                {
+                    question: "Which method serves as the entry point for a C# application?",
+                    options: ["Init()", "Start()", "Main()", "Run()"],
+                    answer: 2,
+                    explanation: "In C#, execution starts with the Main() method, which serves as the program's entry point.",
+                    language: "C#"
+                },
+                {
+                    question: "What file extension is used for C# source code files?",
+                    options: [".c", ".cs", ".cpp", ".csharp"],
+                    answer: 1,
+                    explanation: "C# source code files use the .cs extension.",
+                    language: "C#"
+                },
+                {
+                    question: "What keyword is used to define a class in C#?",
+                    options: ["define", "type", "struct", "class"],
+                    answer: 3,
+                    explanation: "The 'class' keyword is used to define a class in C#.",
+                    language: "C#"
+                },
+                {
+                    question: "What does the 'using' keyword do in C#?",
+                    options: ["Create a loop", "Import a namespace", "Handle exceptions", "Declare a variable"],
+                    answer: 1,
+                    explanation: "The 'using' keyword imports namespaces so you can use types defined in them without specifying their full names.",
+                    language: "C#"
+                },
+                {
+                    question: "What is the base class of all types in C#?",
+                    options: ["System.Class", "System.Type", "System.Object", "System.Base"],
+                    answer: 2,
+                    explanation: "System.Object is the base class from which all types in C# ultimately derive.",
+                    language: "C#"
+                },
+                {
+                    question: "Which keyword is used to inherit a class in C#?",
+                    options: ["extends", "inherits", ":", "->"],
+                    answer: 2,
+                    explanation: "In C#, a colon (:) is used to indicate inheritance from a base class.",
+                    language: "C#"
+                },
+                {
+                    question: "Which C# feature allows you to group related methods and variables?",
+                    options: ["Struct", "Class", "Enum", "Array"],
+                    answer: 1,
+                    explanation: "A class in C# allows grouping of related methods and variables to define objects.",
+                    language: "C#"
+                },
+                {
+                    question: "Which of the following is a value type in C#?",
+                    options: ["string", "class", "int", "object"],
+                    answer: 2,
+                    explanation: "'int' is a value type in C#. It holds data directly rather than by reference.",
+                    language: "C#"
+                },
+                {
+                    question: "Which keyword is used to define an interface in C#?",
+                    options: ["interface", "abstract", "contract", "type"],
+                    answer: 0,
+                    explanation: "The 'interface' keyword defines a contract that implementing classes must follow.",
+                    language: "C#"
+                },
+                {
+                    question: "Which interface is used for sorting in C#?",
+                    options: ["ICloneable", "IEnumerable", "IComparable", "IDisposable"],
+                    answer: 2,
+                    explanation: "The IComparable interface defines a method for comparing objects, useful for sorting.",
+                    language: "C#"
+                },
+                {
+                    question: "What keyword is used to declare a constant value in C#?",
+                    options: ["static", "readonly", "const", "final"],
+                    answer: 2,
+                    explanation: "The 'const' keyword declares a constant whose value is known at compile time.",
+                    language: "C#"
+                },
+                {
+                    question: "What is a delegate in C#?",
+                    options: ["A class object", "A type-safe function pointer", "A variable", "An exception handler"],
+                    answer: 1,
+                    explanation: "A delegate in C# is a type-safe function pointer used to encapsulate method references.",
+                    language: "C#"
+                },
+                {
+                    question: "Which keyword is used to override a base class method?",
+                    options: ["override", "base", "virtual", "extends"],
+                    answer: 0,
+                    explanation: "The 'override' keyword is used to modify a base class method in a derived class.",
+                    language: "C#"
+                },
+                {
+                    question: "Which keyword is used to mark a method that can be overridden?",
+                    options: ["extendable", "base", "virtual", "abstract"],
+                    answer: 2,
+                    explanation: "The 'virtual' keyword marks a method as overridable in derived classes.",
+                    language: "C#"
+                },
+                {
+                    question: "Which C# feature enables iterating over a collection?",
+                    options: ["IEnumerable", "IDisposable", "IData", "ISerializable"],
+                    answer: 0,
+                    explanation: "The IEnumerable interface allows a collection to be iterated using foreach loops.",
+                    language: "C#"
+                },
+                {
+                    question: "Which type in C# represents a sequence of characters?",
+                    options: ["char", "text", "string", "StringBuilder"],
+                    answer: 2,
+                    explanation: "'string' represents a sequence of characters and is an alias for System.String.",
+                    language: "C#"
+                },
+                {
+                    question: "Which C# construct is used to handle exceptions?",
+                    options: ["try-catch", "check", "trap", "handle"],
+                    answer: 0,
+                    explanation: "C# uses try-catch blocks to handle exceptions and manage runtime errors.",
+                    language: "C#"
+                },
+                {
+                    question: "Which C# collection stores key-value pairs?",
+                    options: ["List", "Array", "Dictionary", "Stack"],
+                    answer: 2,
+                    explanation: "The Dictionary<TKey, TValue> type stores data as key-value pairs and allows quick access via keys.",
+                    language: "C#"
+                },
+                {
+                    question: "What does JVM stand for in Java?",
+                    options: ["Java Virtual Machine", "Java Visual Module", "JavaScript Virtual Machine", "Java Verified Method"],
+                    answer: 0,
+                    explanation: "JVM stands for Java Virtual Machine. It's an abstract computing machine that enables a computer to run Java programs as well as programs written in other languages that are compiled to Java bytecode.",
+                    language: "Java"
+                },
+                {
+                    question: "What does SQL stand for?",
+                    options: ["Structured Query Language", "Simple Query Language", "Standard Query Logic", "System Query Layer"],
+                    answer: 0,
+                    explanation: "SQL stands for Structured Query Language. It's a domain-specific language used for managing data in relational database management systems.",
+                    language: "SQL"
+                },
+                {
+                    question: "Which SQL command is used to retrieve data from a database?",
+                    options: ["SELECT", "INSERT", "UPDATE", "DELETE"],
+                    answer: 0,
+                    explanation: "The SELECT statement is used to query and retrieve data from a database table.",
+                    language: "SQL"
+                },
+                {
+                    question: "Which SQL keyword is used to filter the records returned by a query?",
+                    options: ["WHERE", "HAVING", "ORDER BY", "GROUP BY"],
+                    answer: 0,
+                    explanation: "The WHERE clause filters rows based on specified conditions before grouping or sorting.",
+                    language: "SQL"
+                },
+                {
+                    question: "What does the SQL command INSERT do?",
+                    options: ["Updates existing records", "Deletes records", "Adds new records", "Retrieves data"],
+                    answer: 2,
+                    explanation: "INSERT is used to add new rows (records) to a database table.",
+                    language: "SQL"
+                },
+                {
+                    question: "Which SQL clause is used to group rows that have the same values?",
+                    options: ["GROUP BY", "ORDER BY", "WHERE", "HAVING"],
+                    answer: 0,
+                    explanation: "GROUP BY groups rows sharing the same values into summary rows.",
+                    language: "SQL"
+                },
+                {
+                    question: "What keyword is used in SQL to sort the result set?",
+                    options: ["ORDER BY", "SORT BY", "GROUP BY", "FILTER BY"],
+                    answer: 0,
+                    explanation: "ORDER BY sorts the result set by one or more columns.",
+                    language: "SQL"
+                },
+                {
+                    question: "Which SQL statement is used to modify existing data?",
+                    options: ["UPDATE", "INSERT", "DELETE", "ALTER"],
+                    answer: 0,
+                    explanation: "UPDATE modifies existing records in a table.",
+                    language: "SQL"
+                },
+                {
+                    question: "Which SQL command removes rows from a table?",
+                    options: ["DELETE", "REMOVE", "DROP", "TRUNCATE"],
+                    answer: 0,
+                    explanation: "DELETE removes specified rows from a table without deleting the table itself.",
+                    language: "SQL"
+                },
+                {
+                    question: "What is a primary key in SQL?",
+                    options: ["A unique identifier for table rows", "A foreign key reference", "A data type", "An index"],
+                    answer: 0,
+                    explanation: "A primary key uniquely identifies each record in a table and cannot contain NULLs.",
+                    language: "SQL"
+                },
+                {
+                    question: "Which keyword defines a relationship between tables?",
+                    options: ["JOIN", "UNION", "SELECT", "GROUP BY"],
+                    answer: 0,
+                    explanation: "JOIN is used to combine rows from two or more tables based on a related column.",
+                    language: "SQL"
+                },
+                {
+                    question: "Which SQL join returns all records from the left table and matched records from the right table?",
+                    options: ["LEFT JOIN", "RIGHT JOIN", "INNER JOIN", "FULL JOIN"],
+                    answer: 0,
+                    explanation: "LEFT JOIN returns all rows from the left table and matching rows from the right table, or NULL if no match.",
+                    language: "SQL"
+                },
+                {
+                    question: "What does the SQL command CREATE TABLE do?",
+                    options: ["Creates a new table in the database", "Inserts data into a table", "Deletes a table", "Modifies table structure"],
+                    answer: 0,
+                    explanation: "CREATE TABLE creates a new table with defined columns and data types.",
+                    language: "SQL"
+                },
+                {
+                    question: "Which SQL function returns the number of rows in a table?",
+                    options: ["COUNT()", "SUM()", "TOTAL()", "NUMBER()"],
+                    answer: 0,
+                    explanation: "COUNT() returns the number of rows that match a specified condition.",
+                    language: "SQL"
+                },
+                {
+                    question: "What does the HAVING clause do in SQL?",
+                    options: ["Filters groups after aggregation", "Filters rows before grouping", "Sorts the result set", "Joins tables"],
+                    answer: 0,
+                    explanation: "HAVING filters groups created by GROUP BY based on a condition.",
+                    language: "SQL"
+                },
+                {
+                    question: "Which SQL statement is used to delete an entire table?",
+                    options: ["DROP TABLE", "DELETE TABLE", "REMOVE TABLE", "TRUNCATE TABLE"],
+                    answer: 0,
+                    explanation: "DROP TABLE deletes the entire table and its data permanently.",
+                    language: "SQL"
+                },
+                {
+                    question: "What is the difference between DELETE and TRUNCATE?",
+                    options: ["DELETE removes rows individually; TRUNCATE removes all rows quickly", "DELETE deletes tables; TRUNCATE deletes databases", "They are the same", "TRUNCATE is slower than DELETE"],
+                    answer: 0,
+                    explanation: "DELETE removes rows one by one and can be rolled back; TRUNCATE removes all rows quickly and cannot be rolled back in many systems.",
+                    language: "SQL"
+                },
+                {
+                    question: "Which SQL keyword combines the results of two SELECT queries?",
+                    options: ["UNION", "JOIN", "MERGE", "COMBINE"],
+                    answer: 0,
+                    explanation: "UNION combines the result sets of two SELECT statements, removing duplicates by default.",
+                    language: "SQL"
+                },
+                {
+                    question: "What is a foreign key in SQL?",
+                    options: ["A key used to uniquely identify a row in another table", "The primary key of the current table", "An index for faster searches", "A type of data constraint"],
+                    answer: 0,
+                    explanation: "A foreign key is a column or set of columns that references the primary key of another table, establishing a relationship.",
+                    language: "SQL"
+                },
+                {
+                    question: "Which clause is used to specify the condition for a JOIN in SQL?",
+                    options: ["ON", "WHERE", "USING", "MATCH"],
+                    answer: 0,
+                    explanation: "The ON clause specifies the condition to match rows from joined tables.",
+                    language: "SQL"
+                },
+                {
+                    question: "Which SQL statement changes the structure of an existing table?",
+                    options: ["ALTER TABLE", "UPDATE TABLE", "MODIFY TABLE", "CHANGE TABLE"],
+                    answer: 0,
+                    explanation: "ALTER TABLE modifies table structure such as adding or deleting columns.",
+                    language: "SQL"
+                },
+                {
+                    question: "Which company created Go (Golang)?",
+                    options: ["Facebook", "Microsoft", "Google", "Apple"],
+                    answer: 2,
+                    explanation: "Go (or Golang) was developed at Google by Robert Griesemer, Rob Pike, and Ken Thompson. It was announced in 2009 and released as an open-source project.",
+                    language: "Go"
+                },
+                {
+                    question: "What keyword starts a new goroutine in Go?",
+                    options: ["start", "go", "run", "thread"],
+                    answer: 1,
+                    explanation: "The 'go' keyword starts a new goroutine, which is a lightweight thread managed by the Go runtime.",
+                    language: "Go"
+                },
+                {
+                    question: "What is the default file extension for Go source files?",
+                    options: [".gol", ".go", ".g", ".golang"],
+                    answer: 1,
+                    explanation: "Go source files use the '.go' extension.",
+                    language: "Go"
+                },
+                {
+                    question: "Which built-in data structure in Go stores key-value pairs?",
+                    options: ["Array", "Slice", "Map", "Struct"],
+                    answer: 2,
+                    explanation: "Maps in Go are built-in key-value data structures.",
+                    language: "Go"
+                },
+                {
+                    question: "How does Go handle error management?",
+                    options: ["Exceptions", "Try-catch blocks", "Multiple return values", "Signals"],
+                    answer: 2,
+                    explanation: "Go handles errors by returning error values alongside results rather than using exceptions.",
+                    language: "Go"
+                },
+                {
+                    question: "What keyword is used to declare variables in Go?",
+                    options: ["var", "let", "declare", "int"],
+                    answer: 0,
+                    explanation: "Variables in Go are declared using the 'var' keyword.",
+                    language: "Go"
+                },
+                {
+                    question: "What tool formats Go code automatically?",
+                    options: ["gofmt", "goformat", "gocode", "formatgo"],
+                    answer: 0,
+                    explanation: "'gofmt' formats Go source code according to Go style guidelines.",
+                    language: "Go"
+                },
+                {
+                    question: "What does the 'defer' keyword do?",
+                    options: ["Runs a function immediately", "Schedules a function to run after the current function returns", "Starts a goroutine", "Handles panics"],
+                    answer: 1,
+                    explanation: "'defer' schedules a function call to be executed after the surrounding function finishes.",
+                    language: "Go"
+                },
+                {
+                    question: "What is a goroutine?",
+                    options: ["A Go variable", "A lightweight thread", "A function", "A Go package"],
+                    answer: 1,
+                    explanation: "A goroutine is a lightweight thread managed by the Go runtime.",
+                    language: "Go"
+                },
+                {
+                    question: "Which keyword is used to import packages in Go?",
+                    options: ["include", "import", "using", "require"],
+                    answer: 1,
+                    explanation: "'import' is used to include packages in Go source files.",
+                    language: "Go"
+                },
+                {
+                    question: "How does Go manage memory?",
+                    options: ["Manual memory management", "Garbage collection", "Reference counting", "No memory management"],
+                    answer: 1,
+                    explanation: "Go has an automatic garbage collector that manages memory allocation and cleanup.",
+                    language: "Go"
+                },
+                {
+                    question: "What is the zero value of an uninitialized int in Go?",
+                    options: ["nil", "0", "undefined", "null"],
+                    answer: 1,
+                    explanation: "Uninitialized int variables in Go have a zero value of 0.",
+                    language: "Go"
+                },
+                {
+                    question: "What is the purpose of Go interfaces?",
+                    options: ["Define variable types", "Specify method sets", "Declare constants", "Manage memory"],
+                    answer: 1,
+                    explanation: "Interfaces define method sets that types can implement to specify behavior.",
+                    language: "Go"
+                },
+                {
+                    question: "What does the 'select' statement do in Go?",
+                    options: ["Chooses a random goroutine", "Waits on multiple channel operations", "Declares a variable", "Defines a function"],
+                    answer: 1,
+                    explanation: "'select' waits on multiple channel communications and proceeds with one that is ready.",
+                    language: "Go"
+                },
+                {
+                    question: "Which Go data structure represents a dynamically-sized sequence?",
+                    options: ["Array", "Slice", "Map", "Channel"],
+                    answer: 1,
+                    explanation: "Slices are dynamically-sized views over arrays in Go.",
+                    language: "Go"
+                },
+                {
+                    question: "What does the 'make' function do in Go?",
+                    options: ["Allocates memory for slices, maps, and channels", "Creates new structs", "Declares variables", "Starts a goroutine"],
+                    answer: 0,
+                    explanation: "'make' initializes slices, maps, and channels with allocated memory.",
+                    language: "Go"
+                },
+                {
+                    question: "What is the visibility of a Go variable starting with a lowercase letter?",
+                    options: ["Public", "Private to the package", "Global", "Exported"],
+                    answer: 1,
+                    explanation: "Identifiers starting with lowercase letters are private to the package in Go.",
+                    language: "Go"
+                },
+                {
+                    question: "Which keyword is used to define a new type in Go?",
+                    options: ["type", "struct", "class", "define"],
+                    answer: 0,
+                    explanation: "The 'type' keyword declares new types in Go.",
+                    language: "Go"
+                },
+                {
+                    question: "What is the Go playground?",
+                    options: ["An online tool to write and run Go code", "A debugger", "A compiler", "A package manager"],
+                    answer: 0,
+                    explanation: "The Go playground is a web service to write, run, and share Go code snippets online.",
+                    language: "Go"
+                },
+                {
+                    question: "Who are the creators of Go?",
+                    options: ["Dennis Ritchie and Ken Thompson", "James Gosling and Bill Joy", "Robert Griesemer, Rob Pike, and Ken Thompson", "Bjarne Stroustrup and Anders Hejlsberg"],
+                    answer: 2,
+                    explanation: "Go was designed by Robert Griesemer, Rob Pike, and Ken Thompson at Google.",
+                    language: "Go"
+                },
+                {
+                    question: "What does TypeScript add to JavaScript?",
+                    options: ["Runtime type checking", "Static type checking", "Automatic memory management", "Garbage collection"],
+                    answer: 1,
+                    explanation: "TypeScript adds static type checking to JavaScript. Types are checked at compile time, not at runtime, helping catch errors earlier in the development process.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "Who developed TypeScript?",
+                    options: ["Google", "Microsoft", "Facebook", "Mozilla"],
+                    answer: 1,
+                    explanation: "TypeScript was developed and is maintained by Microsoft.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "What file extension is used for TypeScript files?",
+                    options: [".ts", ".js", ".tsx", ".jsx"],
+                    answer: 0,
+                    explanation: "TypeScript files use the .ts extension; .tsx is used for TypeScript files containing JSX.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "Which of the following is true about TypeScript?",
+                    options: ["It runs directly in browsers", "It compiles to JavaScript", "It is a runtime environment", "It replaces JavaScript entirely"],
+                    answer: 1,
+                    explanation: "TypeScript compiles to JavaScript, which can run in any environment that supports JS.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "What is one main benefit of using TypeScript?",
+                    options: ["Faster execution than JavaScript", "Early error detection via types", "Better graphics rendering", "Native mobile app development"],
+                    answer: 1,
+                    explanation: "TypeScript enables early detection of errors by enforcing type checks before runtime.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "Can existing JavaScript code be used in TypeScript projects?",
+                    options: ["Yes, with minimal changes", "No, code must be rewritten", "Only if converted manually", "Only for small scripts"],
+                    answer: 0,
+                    explanation: "TypeScript is a superset of JavaScript, so existing JS code can be used with little or no modification.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "Which feature is NOT supported natively by TypeScript?",
+                    options: ["Interfaces", "Generics", "Multiple inheritance", "Enums"],
+                    answer: 2,
+                    explanation: "TypeScript supports interfaces, generics, and enums, but not multiple inheritance.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "What command is used to compile TypeScript code?",
+                    options: ["tsc", "tscompile", "typescript", "tsbuild"],
+                    answer: 0,
+                    explanation: "The 'tsc' command is the TypeScript compiler used to transpile TypeScript code to JavaScript.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "Which of these is a TypeScript-specific feature?",
+                    options: ["Type annotations", "Promises", "Callbacks", "Arrow functions"],
+                    answer: 0,
+                    explanation: "Type annotations, which specify variable types explicitly, are a TypeScript-specific feature.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "What does TypeScript's 'interface' keyword define?",
+                    options: ["A contract for objects' structure", "A function implementation", "A class inheritance", "A module export"],
+                    answer: 0,
+                    explanation: "Interfaces define the shape or contract that an object should follow.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "Which of these is a benefit of TypeScript's static typing?",
+                    options: ["Improved code editor tooling", "Faster runtime", "Smaller bundle size", "Automatic code deployment"],
+                    answer: 0,
+                    explanation: "Static typing enables better tooling like autocompletion and refactoring in editors.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "Which language feature does TypeScript add to support React development?",
+                    options: ["JSX support via .tsx files", "Class components only", "Built-in state management", "Virtual DOM implementation"],
+                    answer: 0,
+                    explanation: "TypeScript supports JSX syntax in .tsx files to work with React components.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "What is TypeScript's approach to backward compatibility?",
+                    options: ["Fully backward compatible with JavaScript", "Requires rewriting all JS code", "Not compatible with JS", "Runs on a different engine"],
+                    answer: 0,
+                    explanation: "TypeScript is designed to be fully backward compatible with JavaScript.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "What is the type inference in TypeScript?",
+                    options: ["Compiler automatically deduces variable types", "Developer must always specify types", "A debugging tool", "A testing framework"],
+                    answer: 0,
+                    explanation: "Type inference means the compiler can automatically determine variable types without explicit annotations.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "What does the 'any' type signify in TypeScript?",
+                    options: ["Variable can hold any type", "Variable holds numbers only", "Variable holds strings only", "Variable is undefined"],
+                    answer: 0,
+                    explanation: "The 'any' type disables type checking, allowing a variable to hold values of any type.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "Which TypeScript feature helps with code organization in large projects?",
+                    options: ["Namespaces and modules", "Inline styles", "Global variables", "Dynamic typing"],
+                    answer: 0,
+                    explanation: "Namespaces and modules in TypeScript help organize and encapsulate code.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "Which JavaScript version is TypeScript compatible with when compiling?",
+                    options: ["ES3 and later", "Only ES6 and above", "Only ES5", "Only ES2020"],
+                    answer: 0,
+                    explanation: "TypeScript can compile code down to ES3 and above, enabling compatibility with older environments.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "Which of the following is true about TypeScript decorators?",
+                    options: ["They are a stage 2 proposal and supported in TypeScript", "They are standard JavaScript", "They replace classes", "They improve runtime performance"],
+                    answer: 0,
+                    explanation: "Decorators are a proposed feature supported in TypeScript for annotating and modifying classes and members.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "Does TypeScript support object-oriented programming features?",
+                    options: ["Yes, including classes and inheritance", "No, it is purely functional", "Only procedural programming", "Only supports prototypes"],
+                    answer: 0,
+                    explanation: "TypeScript supports classes, inheritance, interfaces, and other OOP features.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "What IDE is known for excellent TypeScript support?",
+                    options: ["Visual Studio Code", "Notepad", "Sublime Text", "Vim"],
+                    answer: 0,
+                    explanation: "Visual Studio Code provides rich support for TypeScript with features like IntelliSense and debugging.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "Which company developed Swift?",
+                    options: ["Google", "Microsoft", "Apple", "Facebook"],
+                    answer: 2,
+                    explanation: "Swift was developed by Apple Inc. and was introduced in 2014 as a replacement for Objective-C for iOS and macOS development.",
+                    language: "Swift"
+                },
+                {
+                    question: "In which year was Swift first released?",
+                    options: ["2012", "2014", "2016", "2018"],
+                    answer: 1,
+                    explanation: "Swift was first announced and released by Apple in 2014.",
+                    language: "Swift"
+                },
+                {
+                    question: "Swift was designed to be a successor to which programming language?",
+                    options: ["C", "Objective-C", "Java", "Python"],
+                    answer: 1,
+                    explanation: "Swift was designed as a modern replacement for Objective-C in Apple’s development ecosystem.",
+                    language: "Swift"
+                },
+                {
+                    question: "Which of the following is a feature of Swift?",
+                    options: ["Automatic Reference Counting", "Manual Memory Management", "No type safety", "No optionals"],
+                    answer: 0,
+                    explanation: "Swift uses Automatic Reference Counting (ARC) for memory management to improve safety and efficiency.",
+                    language: "Swift"
+                },
+                {
+                    question: "What keyword is used in Swift to declare a constant?",
+                    options: ["let", "const", "var", "static"],
+                    answer: 0,
+                    explanation: "'let' is used to declare constants, while 'var' declares variables.",
+                    language: "Swift"
+                },
+                {
+                    question: "Which of these is Swift’s error handling keyword?",
+                    options: ["try", "catch", "throw", "All of the above"],
+                    answer: 3,
+                    explanation: "Swift uses 'try', 'catch', and 'throw' for handling errors in a controlled way.",
+                    language: "Swift"
+                },
+                {
+                    question: "Swift uses what feature to safely handle the absence of a value?",
+                    options: ["Null", "Optional", "Undefined", "Nil"],
+                    answer: 1,
+                    explanation: "Swift uses 'Optionals' to represent values that may be present or absent.",
+                    language: "Swift"
+                },
+                {
+                    question: "What type of programming language paradigm is Swift?",
+                    options: ["Object-oriented", "Functional", "Protocol-oriented", "All of the above"],
+                    answer: 3,
+                    explanation: "Swift supports object-oriented, functional, and protocol-oriented programming paradigms.",
+                    language: "Swift"
+                },
+                {
+                    question: "Which keyword is used to declare a variable in Swift?",
+                    options: ["var", "let", "dim", "int"],
+                    answer: 0,
+                    explanation: "'var' declares a mutable variable in Swift.",
+                    language: "Swift"
+                },
+                {
+                    question: "Which of these is NOT a Swift collection type?",
+                    options: ["Array", "Dictionary", "Set", "Queue"],
+                    answer: 3,
+                    explanation: "Swift has Array, Dictionary, and Set as built-in collection types; Queue is not built-in.",
+                    language: "Swift"
+                },
+                {
+                    question: "Which Swift feature allows a function to accept different data types?",
+                    options: ["Generics", "Inheritance", "Closures", "Protocols"],
+                    answer: 0,
+                    explanation: "Generics enable functions and types to work with any data type while maintaining type safety.",
+                    language: "Swift"
+                },
+                {
+                    question: "How does Swift indicate a function that does not return a value?",
+                    options: ["void", "null", "None", "Void"],
+                    answer: 3,
+                    explanation: "Swift uses 'Void' or an empty tuple '()' to represent a function with no return value.",
+                    language: "Swift"
+                },
+                {
+                    question: "Which of the following is used to define a protocol in Swift?",
+                    options: ["protocol", "interface", "abstract", "class"],
+                    answer: 0,
+                    explanation: "Swift uses the 'protocol' keyword to define protocols.",
+                    language: "Swift"
+                },
+                {
+                    question: "What is the Swift feature that allows you to assign default values to function parameters?",
+                    options: ["Optional parameters", "Default parameters", "Variadic parameters", "Closures"],
+                    answer: 1,
+                    explanation: "Swift allows functions to have default parameter values, which are used when arguments are omitted.",
+                    language: "Swift"
+                },
+                {
+                    question: "What is the primary tool used to build and manage Swift projects?",
+                    options: ["Xcode", "Visual Studio", "Eclipse", "IntelliJ"],
+                    answer: 0,
+                    explanation: "Xcode is Apple's integrated development environment (IDE) for Swift and other languages.",
+                    language: "Swift"
+                },
+                {
+                    question: "Which statement about Swift closures is true?",
+                    options: ["Closures are self-contained blocks of functionality", "Closures cannot capture values from their context", "Closures do not support parameters", "Closures must be declared globally"],
+                    answer: 0,
+                    explanation: "Closures are similar to lambdas or anonymous functions and can capture values from their surrounding context.",
+                    language: "Swift"
+                },
+                {
+                    question: "How does Swift represent a nil value for optional types?",
+                    options: ["null", "nil", "None", "undefined"],
+                    answer: 1,
+                    explanation: "Swift uses 'nil' to represent the absence of a value in an Optional.",
+                    language: "Swift"
+                },
+                {
+                    question: "Which Swift feature helps avoid strong reference cycles?",
+                    options: ["Weak references", "Strong references", "Unsafe pointers", "Manual memory management"],
+                    answer: 0,
+                    explanation: "Swift supports 'weak' and 'unowned' references to prevent retain cycles in reference types.",
+                    language: "Swift"
+                },
+                {
+                    question: "What is the default visibility level of Swift types and members?",
+                    options: ["public", "private", "internal", "fileprivate"],
+                    answer: 2,
+                    explanation: "The default access level in Swift is 'internal', meaning accessible within the same module.",
+                    language: "Swift"
+                },
+                {
+                    question: "Swift's error handling model uses which construct to signal an error?",
+                    options: ["throw", "raise", "catch", "try"],
+                    answer: 0,
+                    explanation: "Errors are signaled using 'throw' and must be caught or propagated using 'try' and 'catch'.",
+                    language: "Swift"
+                },
+                {
+                    question: "What is the mascot of Scratch programming language?",
+                    options: ["A cat", "A dog", "A bird", "A fish"],
+                    answer: 0,
+                    explanation: "Scratch's mascot is an orange cat. The cat appears in the Scratch logo and as the default sprite in new Scratch projects.",
+                    language: "Scratch"
+                },
+                {
+                    question: "Who developed the Scratch programming language?",
+                    options: ["MIT Media Lab", "Google", "Microsoft", "Apple"],
+                    answer: 0,
+                    explanation: "Scratch was developed by the Lifelong Kindergarten Group at the MIT Media Lab.",
+                    language: "Scratch"
+                },
+                {
+                    question: "What type of programming language is Scratch?",
+                    options: ["Block-based", "Text-based", "Assembly", "Machine code"],
+                    answer: 0,
+                    explanation: "Scratch is a block-based visual programming language designed for beginners.",
+                    language: "Scratch"
+                },
+                {
+                    question: "Which age group is Scratch primarily designed for?",
+                    options: ["8-16 years old", "25-40 years old", "40-60 years old", "3-7 years old"],
+                    answer: 0,
+                    explanation: "Scratch is mainly designed for children aged 8 to 16 to learn programming concepts.",
+                    language: "Scratch"
+                },
+                {
+                    question: "In Scratch, what are characters or objects called?",
+                    options: ["Sprites", "Actors", "Spritesheets", "Actorsheets"],
+                    answer: 0,
+                    explanation: "In Scratch, characters or objects are called sprites.",
+                    language: "Scratch"
+                },
+                {
+                    question: "Which programming concept does Scratch use to control the flow of a program?",
+                    options: ["Scripts", "Functions", "Procedures", "Classes"],
+                    answer: 0,
+                    explanation: "Scratch programs are made by creating scripts with blocks that control the flow.",
+                    language: "Scratch"
+                },
+                {
+                    question: "What is the Scratch online platform used for?",
+                    options: ["Sharing and remixing projects", "Installing Scratch offline", "Coding in Python", "Debugging code"],
+                    answer: 0,
+                    explanation: "The Scratch website allows users to share and remix projects made by others.",
+                    language: "Scratch"
+                },
+                {
+                    question: "Which of the following is NOT a type of block in Scratch?",
+                    options: ["Conditional", "Motion", "Dataframe", "Looks"],
+                    answer: 2,
+                    explanation: "Scratch blocks include Motion, Looks, Sound, Events, Control, Sensing, Operators, and Variables; 'Dataframe' is not a block type.",
+                    language: "Scratch"
+                },
+                {
+                    question: "What does the 'green flag' icon do in Scratch?",
+                    options: ["Starts the program", "Stops the program", "Saves the project", "Deletes a sprite"],
+                    answer: 0,
+                    explanation: "Clicking the green flag starts the execution of scripts in Scratch.",
+                    language: "Scratch"
+                },
+                {
+                    question: "Which of these is a popular use of Scratch?",
+                    options: ["Creating interactive stories", "Developing mobile apps", "Operating systems", "Database management"],
+                    answer: 0,
+                    explanation: "Scratch is often used to create interactive stories, games, and animations.",
+                    language: "Scratch"
+                },
+                {
+                    question: "What programming principle does Scratch emphasize to teach beginners?",
+                    options: ["Event-driven programming", "Multithreading", "Pointers", "Inheritance"],
+                    answer: 0,
+                    explanation: "Scratch emphasizes event-driven programming where scripts respond to events like clicks or key presses.",
+                    language: "Scratch"
+                },
+                {
+                    question: "Which language is Scratch primarily designed to replace or simplify for young learners?",
+                    options: ["Text-based programming languages", "Assembly language", "HTML", "SQL"],
+                    answer: 0,
+                    explanation: "Scratch simplifies text-based programming languages by using drag-and-drop blocks.",
+                    language: "Scratch"
+                },
+                {
+                    question: "Can Scratch projects be exported as standalone executable programs?",
+                    options: ["No, they run inside the Scratch environment", "Yes, as .exe files", "Yes, as Java apps", "Yes, as HTML files"],
+                    answer: 0,
+                    explanation: "Scratch projects run inside the Scratch environment or online; they can't be exported as standalone executables.",
+                    language: "Scratch"
+                },
+                {
+                    question: "What is the main visual style of programming blocks in Scratch?",
+                    options: ["Puzzle-piece shapes", "Rectangular lines", "Circular nodes", "Text commands"],
+                    answer: 0,
+                    explanation: "Scratch programming blocks are shaped like puzzle pieces that fit together.",
+                    language: "Scratch"
+                },
+                {
+                    question: "What feature allows users to customize sprites in Scratch?",
+                    options: ["Costumes", "Themes", "Skins", "Templates"],
+                    answer: 0,
+                    explanation: "Sprites can have different costumes to change their appearance in Scratch.",
+                    language: "Scratch"
+                },
+                {
+                    question: "Which platform(s) can run Scratch projects?",
+                    options: ["Web browsers and Scratch desktop app", "Only Windows", "Only macOS", "Only Linux"],
+                    answer: 0,
+                    explanation: "Scratch projects run in web browsers and also via Scratch's desktop application on multiple OSes.",
+                    language: "Scratch"
+                },
+                {
+                    question: "What can Scratch users create besides games?",
+                    options: ["Animations, stories, music", "Only games", "Databases", "Mobile apps"],
+                    answer: 0,
+                    explanation: "Scratch users create animations, interactive stories, music, and games.",
+                    language: "Scratch"
+                },
+                {
+                    question: "Which Scratch block category includes loops and conditional statements?",
+                    options: ["Control", "Motion", "Sound", "Events"],
+                    answer: 0,
+                    explanation: "The Control category contains loops, conditionals, and event control blocks.",
+                    language: "Scratch"
+                },
+                {
+                    question: "How does Scratch handle variables?",
+                    options: ["Users can create and use variables in projects", "Variables are fixed and cannot be added", "Scratch does not support variables", "Variables are only for costumes"],
+                    answer: 0,
+                    explanation: "Scratch allows users to create variables to store and manipulate data during a project.",
+                    language: "Scratch"
+                },
+                {
+                    question: "What year was the Scratch 1.0 version officially released?",
+                    options: ["2007", "2010", "2015", "2020"],
+                    answer: 0,
+                    explanation: "Scratch 1.0 was officially released in 2007.",
+                    language: "Scratch"
+                },
+                {
+                    question: "What does the '++' in C++ represent?",
+                    options: ["Increment operator", "Object-oriented features", "Enhanced performance", "Additional libraries"],
+                    answer: 1,
+                    explanation: "The '++' in C++ represents the incremental improvement to C, particularly the addition of object-oriented features. The name was coined by Rick Mascitti in 1983.",
+                    language: "C++"
+                },
+                {
+                    question: "Who developed C++?",
+                    options: ["Bjarne Stroustrup", "Dennis Ritchie", "James Gosling", "Guido van Rossum"],
+                    answer: 0,
+                    explanation: "C++ was developed by Bjarne Stroustrup at Bell Labs in the early 1980s as an extension of the C language.",
+                    language: "C++"
+                },
+                {
+                    question: "Which of the following is a feature introduced in C++ but not in C?",
+                    options: ["Pointers", "Functions", "Object-oriented programming", "Preprocessor directives"],
+                    answer: 2,
+                    explanation: "C++ introduced object-oriented programming, including classes and inheritance, which are not present in C.",
+                    language: "C++"
+                },
+                {
+                    question: "Which keyword is used to create a class in C++?",
+                    options: ["struct", "class", "define", "object"],
+                    answer: 1,
+                    explanation: "The 'class' keyword is used to define a class in C++, which encapsulates data and functions.",
+                    language: "C++"
+                },
+                {
+                    question: "Which file extension is commonly used for C++ source code?",
+                    options: [".c", ".cc", ".cpp", ".cxx"],
+                    answer: 2,
+                    explanation: ".cpp is the most commonly used extension for C++ source files.",
+                    language: "C++"
+                },
+                {
+                    question: "What is the main function in a C++ program?",
+                    options: ["init()", "start()", "main()", "program()"],
+                    answer: 2,
+                    explanation: "The main() function is the entry point of any C++ program.",
+                    language: "C++"
+                },
+                {
+                    question: "Which access specifier allows members to be accessed only within the class?",
+                    options: ["public", "private", "protected", "internal"],
+                    answer: 1,
+                    explanation: "The 'private' specifier restricts access to class members only within the class itself.",
+                    language: "C++"
+                },
+                {
+                    question: "Which feature allows multiple functions with the same name in C++?",
+                    options: ["Inheritance", "Polymorphism", "Function overloading", "Encapsulation"],
+                    answer: 2,
+                    explanation: "Function overloading in C++ allows multiple functions to have the same name with different parameters.",
+                    language: "C++"
+                },
+                {
+                    question: "What is a constructor in C++?",
+                    options: ["A function that creates objects", "A loop", "A type of pointer", "A destructor"],
+                    answer: 0,
+                    explanation: "A constructor is a special function automatically called when an object is created.",
+                    language: "C++"
+                },
+                {
+                    question: "What is the use of the 'new' keyword in C++?",
+                    options: ["Declare a new class", "Initialize a variable", "Create a new thread", "Allocate memory dynamically"],
+                    answer: 3,
+                    explanation: "The 'new' keyword allocates memory on the heap for a variable or object.",
+                    language: "C++"
+                },
+                {
+                    question: "Which operator is used to access members of a class through a pointer?",
+                    options: [".", "::", "->", "&"],
+                    answer: 2,
+                    explanation: "The '->' operator is used to access members of a class or struct via a pointer.",
+                    language: "C++"
+                },
+                {
+                    question: "Which type of inheritance allows a class to inherit from more than one base class?",
+                    options: ["Single", "Multilevel", "Hierarchical", "Multiple"],
+                    answer: 3,
+                    explanation: "C++ supports multiple inheritance, allowing a class to inherit from more than one base class.",
+                    language: "C++"
+                },
+                {
+                    question: "What is a virtual function in C++?",
+                    options: ["A function that does not exist", "A function with no return type", "A function that can be overridden in derived classes", "A function declared outside of a class"],
+                    answer: 2,
+                    explanation: "A virtual function allows a derived class to override it, enabling runtime polymorphism.",
+                    language: "C++"
+                },
+                {
+                    question: "Which STL container stores key-value pairs?",
+                    options: ["vector", "set", "map", "queue"],
+                    answer: 2,
+                    explanation: "The 'map' container in the Standard Template Library (STL) stores key-value pairs.",
+                    language: "C++"
+                },
+                {
+                    question: "What does 'template' in C++ refer to?",
+                    options: ["A design pattern", "A macro function", "A way to define generic classes or functions", "A namespace"],
+                    answer: 2,
+                    explanation: "Templates in C++ allow the creation of generic functions and classes.",
+                    language: "C++"
+                },
+                {
+                    question: "Which of the following is a valid C++ loop construct?",
+                    options: ["foreach", "repeat-until", "while", "loop"],
+                    answer: 2,
+                    explanation: "C++ supports the 'while' loop among other loop constructs like 'for' and 'do-while'.",
+                    language: "C++"
+                },
+                {
+                    question: "What is a namespace in C++?",
+                    options: ["A class", "A type of variable", "A function", "A declarative region that provides scope"],
+                    answer: 3,
+                    explanation: "A namespace defines a scope to avoid naming conflicts between identifiers.",
+                    language: "C++"
+                },
+                {
+                    question: "What is the default access specifier for class members in C++?",
+                    options: ["public", "protected", "private", "global"],
+                    answer: 2,
+                    explanation: "By default, class members in C++ are private.",
+                    language: "C++"
+                },
+                {
+                    question: "What is the purpose of the 'this' pointer in C++?",
+                    options: ["To refer to the parent class", "To access global variables", "To point to the current object", "To delete the object"],
+                    answer: 2,
+                    explanation: "The 'this' pointer refers to the current object in a class's member function.",
+                    language: "C++"
+                },
+                {
+                    question: "What is RAII in C++?",
+                    options: ["Run-time array indexing", "Resource Acquisition Is Initialization", "Recursive Access Inheritance Implementation", "Random Access Integrated Interface"],
+                    answer: 1,
+                    explanation: "RAII is a C++ idiom that binds resource management to object lifetime, ensuring resources are released properly.",
+                    language: "C++"
+                },
+                {
+                    question: "What is the primary use of PHP?",
+                    options: ["Mobile app development", "Desktop applications", "Web development", "Embedded systems"],
+                    answer: 2,
+                    explanation: "PHP (Hypertext Preprocessor) is primarily used for web development, particularly server-side scripting. It's especially popular for creating dynamic web pages.",
+                    language: "PHP"
+                },
+                {
+                    question: "Who created PHP?",
+                    options: ["Rasmus Lerdorf", "Brendan Eich", "Guido van Rossum", "James Gosling"],
+                    answer: 0,
+                    explanation: "PHP was created by Rasmus Lerdorf in 1994 initially as a set of Common Gateway Interface (CGI) binaries.",
+                    language: "PHP"
+                },
+                {
+                    question: "What does PHP originally stand for?",
+                    options: ["Personal Home Page", "Private Home Page", "Professional Hypertext Processor", "Preprocessed Hypertext"],
+                    answer: 0,
+                    explanation: "PHP originally stood for Personal Home Page before it was renamed to Hypertext Preprocessor.",
+                    language: "PHP"
+                },
+                {
+                    question: "Which symbol is used to start a variable in PHP?",
+                    options: ["@", "$", "#", "&"],
+                    answer: 1,
+                    explanation: "In PHP, all variable names start with the dollar sign ($) symbol.",
+                    language: "PHP"
+                },
+                {
+                    question: "Which function is used to output data in PHP?",
+                    options: ["print()", "echo()", "write()", "output()"],
+                    answer: 1,
+                    explanation: "'echo()' is commonly used to output strings or variables in PHP.",
+                    language: "PHP"
+                },
+                {
+                    question: "Which database is most commonly used with PHP?",
+                    options: ["MongoDB", "PostgreSQL", "MySQL", "SQLite"],
+                    answer: 2,
+                    explanation: "MySQL is the most commonly used relational database management system with PHP.",
+                    language: "PHP"
+                },
+                {
+                    question: "Which of the following is the correct way to start a PHP script?",
+                    options: ["<?php ?>", "<php>", "<? ?>", "<script>"],
+                    answer: 0,
+                    explanation: "PHP code is enclosed within <?php and ?> tags.",
+                    language: "PHP"
+                },
+                {
+                    question: "What does the PHP function isset() do?",
+                    options: ["Checks if a variable is set and not null", "Deletes a variable", "Creates a variable", "Assigns a value"],
+                    answer: 0,
+                    explanation: "isset() returns true if a variable exists and is not null.",
+                    language: "PHP"
+                },
+                {
+                    question: "How do you create an array in PHP?",
+                    options: ["array()", "new Array()", "list()", "create_array()"],
+                    answer: 0,
+                    explanation: "The array() function is used to create an array in PHP.",
+                    language: "PHP"
+                },
+                {
+                    question: "Which of the following is a PHP superglobal variable?",
+                    options: ["$_POST", "$_GET", "$_SESSION", "All of the above"],
+                    answer: 3,
+                    explanation: "$_POST, $_GET, and $_SESSION are all PHP superglobal variables used to access different kinds of data.",
+                    language: "PHP"
+                },
+                {
+                    question: "Which keyword is used to declare a class in PHP?",
+                    options: ["class", "def", "object", "struct"],
+                    answer: 0,
+                    explanation: "The 'class' keyword is used to declare a class in PHP.",
+                    language: "PHP"
+                },
+                {
+                    question: "What does the '->' operator do in PHP?",
+                    options: ["Accesses an object's property or method", "Concatenates strings", "Performs arithmetic subtraction", "Checks equality"],
+                    answer: 0,
+                    explanation: "The '->' operator is used to access properties or methods of an object.",
+                    language: "PHP"
+                },
+                {
+                    question: "Which PHP function is used to include and evaluate a specified file?",
+                    options: ["require()", "include()", "insert()", "import()"],
+                    answer: 1,
+                    explanation: "The include() function includes and evaluates the specified file during script execution.",
+                    language: "PHP"
+                },
+                {
+                    question: "Which function is used to start a session in PHP?",
+                    options: ["session_start()", "start_session()", "begin_session()", "init_session()"],
+                    answer: 0,
+                    explanation: "session_start() initializes a new session or resumes an existing one.",
+                    language: "PHP"
+                },
+                {
+                    question: "Which PHP error level indicates a fatal runtime error?",
+                    options: ["E_WARNING", "E_NOTICE", "E_ERROR", "E_PARSE"],
+                    answer: 2,
+                    explanation: "E_ERROR indicates a fatal runtime error that stops script execution.",
+                    language: "PHP"
+                },
+                {
+                    question: "What is the output of strlen('PHP')?",
+                    options: ["2", "3", "4", "Error"],
+                    answer: 1,
+                    explanation: "strlen() returns the length of the string, which is 3 for 'PHP'.",
+                    language: "PHP"
+                },
+                {
+                    question: "Which PHP function is used to connect to a MySQL database?",
+                    options: ["mysql_connect()", "mysqli_connect()", "connect_mysql()", "db_connect()"],
+                    answer: 1,
+                    explanation: "mysqli_connect() is used to establish a connection to a MySQL database.",
+                    language: "PHP"
+                },
+                {
+                    question: "How do you write a comment that spans multiple lines in PHP?",
+                    options: ["// comment", "# comment", "/* comment */", "<!-- comment -->"],
+                    answer: 2,
+                    explanation: "/* ... */ syntax is used for multi-line comments in PHP.",
+                    language: "PHP"
+                },
+                {
+                    question: "Which function is used to check the type of a variable in PHP?",
+                    options: ["gettype()", "typeof()", "type()", "varType()"],
+                    answer: 0,
+                    explanation: "gettype() returns the type of a variable in PHP.",
+                    language: "PHP"
+                },
+                {
+                    question: "Which version of PHP introduced namespaces?",
+                    options: ["PHP 4", "PHP 5.3", "PHP 7", "PHP 8"],
+                    answer: 1,
+                    explanation: "Namespaces were introduced in PHP 5.3 to avoid name collisions.",
+                    language: "PHP"
+                },
+                {
+                    question: "What does the 'yield' keyword do in Python?",
+                    options: ["Terminates a function", "Creates a generator", "Imports a module", "Defines a class"],
+                    answer: 1,
+                    explanation: "In Python, the 'yield' keyword is used to create a generator function that returns an iterator. It allows functions to maintain their state between calls.",
+                    language: "Python"
+                },
+                {
+                    question: "Which of these is NOT a feature of C#?",
+                    options: ["Garbage collection", "Pointers", "Global interpreter lock", "Properties"],
+                    answer: 2,
+                    explanation: "The Global Interpreter Lock (GIL) is a feature of Python, not C#. C# has garbage collection, supports pointers (in unsafe mode), and has properties as language features.",
+                    language: "C#"
+                },
+                {
+                    question: "What is the original name of JavaScript?",
+                    options: ["LiveScript", "ECMAScript", "JScript", "TypeScript"],
+                    answer: 0,
+                    explanation: "JavaScript was originally named LiveScript when it was developed at Netscape. It was renamed to JavaScript to capitalize on the popularity of Java, despite having little relation to Java.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "What does BASIC stand for in Visual Basic?",
+                    options: ["Beginner's All-purpose Symbolic Instruction Code", "Basic Application System for Integrated Computing", "Binary Algorithmic System for Information Control", "Beginner's Automated System for Instructional Computing"],
+                    answer: 0,
+                    explanation: "BASIC stands for Beginner's All-purpose Symbolic Instruction Code. Visual Basic is Microsoft's implementation of the BASIC programming language with a visual interface.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "Which company developed Visual Basic?",
+                    options: ["IBM", "Apple", "Microsoft", "Google"],
+                    answer: 2,
+                    explanation: "Visual Basic was developed by Microsoft and first released in 1991.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "Visual Basic is primarily used for what type of application development?",
+                    options: ["Web development", "Desktop GUI applications", "Mobile apps", "Operating systems"],
+                    answer: 1,
+                    explanation: "Visual Basic is widely used for creating desktop graphical user interface (GUI) applications.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "Which event-driven programming feature is Visual Basic known for?",
+                    options: ["Procedural programming", "Event handling", "Functional programming", "Logic programming"],
+                    answer: 1,
+                    explanation: "Visual Basic introduced easy event handling, allowing developers to write code that responds to user actions.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "What file extension is typically used for Visual Basic source code files?",
+                    options: [".vb", ".vbs", ".bas", ".vbp"],
+                    answer: 0,
+                    explanation: "Visual Basic source files typically use the '.vb' extension.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "Which integrated development environment (IDE) is commonly used for Visual Basic development?",
+                    options: ["Visual Studio", "Eclipse", "Xcode", "NetBeans"],
+                    answer: 0,
+                    explanation: "Microsoft Visual Studio is the primary IDE for Visual Basic development.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "Visual Basic .NET is based on which framework?",
+                    options: [".NET Framework", "Java Virtual Machine", "Mono Framework", "React Native"],
+                    answer: 0,
+                    explanation: "Visual Basic .NET runs on the Microsoft .NET Framework, enabling modern app development.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "Which keyword in Visual Basic is used to declare a variable?",
+                    options: ["Dim", "var", "let", "declare"],
+                    answer: 0,
+                    explanation: "'Dim' is used to declare variables in Visual Basic.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "In Visual Basic, which data type represents a decimal number?",
+                    options: ["Integer", "Double", "String", "Boolean"],
+                    answer: 1,
+                    explanation: "'Double' is used to represent floating-point decimal numbers.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "Which keyword is used to create a loop that executes while a condition is true?",
+                    options: ["While", "For", "Loop", "Repeat"],
+                    answer: 0,
+                    explanation: "The 'While' loop runs as long as its condition remains true.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "Which statement is used to handle errors in Visual Basic?",
+                    options: ["Try...Catch", "On Error", "Throw", "Except"],
+                    answer: 1,
+                    explanation: "'On Error' is the traditional way to handle errors in Visual Basic before .NET introduced Try...Catch.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "Which of the following is the correct way to start a subroutine in Visual Basic?",
+                    options: ["Sub MySub()", "function MySub()", "procedure MySub()", "start MySub()"],
+                    answer: 0,
+                    explanation: "Visual Basic uses the 'Sub' keyword to define subroutines.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "What is the default access modifier for members in a Visual Basic class?",
+                    options: ["Public", "Private", "Protected", "Friend"],
+                    answer: 1,
+                    explanation: "By default, members of a class are 'Private' in Visual Basic.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "Which of these is a valid way to concatenate strings in Visual Basic?",
+                    options: ["Using the & operator", "Using the + operator", "Both & and + operators", "Using the .concat() method"],
+                    answer: 2,
+                    explanation: "Both '&' and '+' operators can be used to concatenate strings in Visual Basic, though '&' is preferred.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "What is the main difference between Visual Basic and Visual Basic .NET?",
+                    options: ["VB.NET is compiled to bytecode", "VB.NET runs on .NET Framework", "VB.NET supports object-oriented programming", "All of the above"],
+                    answer: 3,
+                    explanation: "Visual Basic .NET is a modernized version supporting object-oriented programming and runs on the .NET Framework.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "Which control structure is used to execute one block of code among many options?",
+                    options: ["Select Case", "If...Else", "Switch", "Choose"],
+                    answer: 0,
+                    explanation: "'Select Case' allows branching based on multiple possible values in Visual Basic.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "How do you declare a constant in Visual Basic?",
+                    options: ["Const", "Let", "Constant", "Static"],
+                    answer: 0,
+                    explanation: "The 'Const' keyword declares constants in Visual Basic.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "Which of the following is NOT a supported Visual Basic data type?",
+                    options: ["Boolean", "Decimal", "Character", "Float"],
+                    answer: 3,
+                    explanation: "Visual Basic does not have a 'Float' type; instead, it uses 'Single' and 'Double' for floating-point numbers.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "What symbol is used to start a comment in Visual Basic?",
+                    options: ["'", "//", "#", "/*"],
+                    answer: 0,
+                    explanation: "A single quote (') begins a comment in Visual Basic.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "What is the name of the graphical user interface designer used in Visual Basic development?",
+                    options: ["Form Designer", "UI Builder", "Window Creator", "Control Studio"],
+                    answer: 0,
+                    explanation: "The Form Designer allows developers to design GUIs visually in Visual Basic.",
+                    language: "Visual Basic"
+                },
+                {
+                    question: "What is the primary paradigm of C?",
+                    options: ["Object-oriented", "Functional", "Procedural", "Event-driven"],
+                    answer: 2,
+                    explanation: "C is primarily a procedural programming language, focusing on procedures or routines that operate on data, rather than combining data and functions into objects.",
+                    language: "C"
+                },
+                {
+                    question: "Who developed the C programming language?",
+                    options: ["Bjarne Stroustrup", "James Gosling", "Dennis Ritchie", "Guido van Rossum"],
+                    answer: 2,
+                    explanation: "C was developed by Dennis Ritchie at Bell Labs in the early 1970s.",
+                    language: "C"
+                },
+                {
+                    question: "Which language was C developed as an improvement of?",
+                    options: ["Assembly", "Fortran", "B", "Pascal"],
+                    answer: 2,
+                    explanation: "C was developed as a successor to the B programming language, which itself was influenced by BCPL.",
+                    language: "C"
+                },
+                {
+                    question: "Which year was the C language developed?",
+                    options: ["1969", "1972", "1979", "1983"],
+                    answer: 1,
+                    explanation: "C was developed in 1972 by Dennis Ritchie at Bell Labs.",
+                    language: "C"
+                },
+                {
+                    question: "What is the standard file extension for a C source file?",
+                    options: [".cpp", ".java", ".py", ".c"],
+                    answer: 3,
+                    explanation: "C source files typically have the extension '.c'.",
+                    language: "C"
+                },
+                {
+                    question: "Which keyword is used to define a constant in C?",
+                    options: ["let", "const", "define", "#define"],
+                    answer: 3,
+                    explanation: "#define is a preprocessor directive used to define constants in C.",
+                    language: "C"
+                },
+                {
+                    question: "What is the purpose of the 'main' function in C?",
+                    options: ["To include libraries", "To define global variables", "To serve as the program’s entry point", "To return memory to the OS"],
+                    answer: 2,
+                    explanation: "The main function serves as the entry point for C programs.",
+                    language: "C"
+                },
+                {
+                    question: "What does 'printf' do in C?",
+                    options: ["Reads input", "Prints output to the console", "Compiles code", "Defines a function"],
+                    answer: 1,
+                    explanation: "The printf function outputs formatted text to the console.",
+                    language: "C"
+                },
+                {
+                    question: "What is the size of an int in most 32-bit systems?",
+                    options: ["2 bytes", "4 bytes", "8 bytes", "Depends on the compiler"],
+                    answer: 1,
+                    explanation: "On most 32-bit systems, an int is 4 bytes in size.",
+                    language: "C"
+                },
+                {
+                    question: "What is a pointer in C?",
+                    options: ["A loop", "A function", "A variable that stores the address of another variable", "A preprocessor directive"],
+                    answer: 2,
+                    explanation: "A pointer stores the memory address of another variable.",
+                    language: "C"
+                },
+                {
+                    question: "Which symbol is used to access the value pointed to by a pointer?",
+                    options: ["&", "*", "%", "#"],
+                    answer: 1,
+                    explanation: "The asterisk (*) is used to dereference a pointer and access the value it points to.",
+                    language: "C"
+                },
+                {
+                    question: "What is the role of the 'return' statement in a C function?",
+                    options: ["To define a loop", "To exit the program", "To return a value from a function", "To include a file"],
+                    answer: 2,
+                    explanation: "The return statement is used to return a value from a function to its caller.",
+                    language: "C"
+                },
+                {
+                    question: "Which header file is required for using 'printf' and 'scanf'?",
+                    options: ["math.h", "stdio.h", "string.h", "stdlib.h"],
+                    answer: 1,
+                    explanation: "The stdio.h header file includes declarations for printf and scanf functions.",
+                    language: "C"
+                },
+                {
+                    question: "Which symbol is used to denote a single-line comment in C?",
+                    options: ["//", "/* */", "#", "--"],
+                    answer: 0,
+                    explanation: "In modern C, single-line comments use the // syntax, introduced in C99.",
+                    language: "C"
+                },
+                {
+                    question: "What does 'sizeof' return?",
+                    options: ["Size of a file", "Size of a data type or variable", "Number of elements in an array", "Length of a string"],
+                    answer: 1,
+                    explanation: "sizeof returns the size in bytes of a data type or variable.",
+                    language: "C"
+                },
+                {
+                    question: "Which of the following is used to dynamically allocate memory in C?",
+                    options: ["new", "malloc", "alloc", "create"],
+                    answer: 1,
+                    explanation: "The malloc function is used to allocate memory dynamically in C.",
+                    language: "C"
+                },
+                {
+                    question: "What is the default return type of the main function in C?",
+                    options: ["void", "int", "char", "float"],
+                    answer: 1,
+                    explanation: "The main function should return an int, indicating the exit status to the operating system.",
+                    language: "C"
+                },
+                {
+                    question: "Which keyword is used to prevent a variable from being modified?",
+                    options: ["static", "volatile", "final", "const"],
+                    answer: 3,
+                    explanation: "The const keyword declares a variable as constant, preventing modification after initialization.",
+                    language: "C"
+                },
+                {
+                    question: "Which operator is used to access structure members using a pointer?",
+                    options: [".", "::", "->", "&"],
+                    answer: 2,
+                    explanation: "The -> operator is used to access structure members through a pointer.",
+                    language: "C"
+                },
+                {
+                    question: "Which standard defines the most widely used version of the C language?",
+                    options: ["C98", "C99", "ANSI C", "ISO C++"],
+                    answer: 2,
+                    explanation: "ANSI C (also known as C89 or ISO C90) is the standard that defined the widely accepted version of the C language.",
+                    language: "C"
+                },
+                {
+                    question: "What does the 'defer' keyword do in Go?",
+                    options: ["Delays function execution", "Schedules function execution at the end of the current scope", "Creates an asynchronous function", "Handles errors"],
+                    answer: 1,
+                    explanation: "In Go, the 'defer' keyword schedules a function call to be executed immediately before the surrounding function returns. It's often used for cleanup operations.",
+                    language: "Go"
+                },
+                {
+                    question: "Which of these is NOT a valid SQL command?",
+                    options: ["SELECT", "UPDATE", "DELETE", "MODIFY"],
+                    answer: 3,
+                    explanation: "MODIFY is not a standard SQL command. The standard SQL commands for data manipulation are SELECT (retrieve data), INSERT (add data), UPDATE (modify data), and DELETE (remove data).",
+                    language: "SQL"
+                },
+                {
+                    question: "What does the '===' operator check in JavaScript?",
+                    options: ["Value equality only", "Reference equality only", "Both value and type equality", "Object property equality"],
+                    answer: 2,
+                    explanation: "The '===' operator in JavaScript checks for both value and type equality, without performing type conversion. It's called the strict equality operator.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "What is the main feature that TypeScript adds to JavaScript?",
+                    options: ["Static typing", "Automatic memory management", "Built-in UI components", "Database connectivity"],
+                    answer: 0,
+                    explanation: "The main feature TypeScript adds to JavaScript is static typing. This allows developers to specify types for variables, function parameters, and return values.",
+                    language: "TypeScript"
+                },
+                {
+                    question: "Which symbol is used to denote a variable in PHP?",
+                    options: ["$", "#", "@", "&"],
+                    answer: 0,
+                    explanation: "In PHP, variables are denoted with a dollar sign ($). For example: $variable_name = 'value';",
+                    language: "PHP"
+                },
+                {
+                    question: "What does the 'self' keyword refer to in Python?",
+                    options: ["The current module", "The current function", "The current instance of a class", "The parent class"],
+                    answer: 2,
+                    explanation: "In Python, 'self' refers to the current instance of a class. It's used as the first parameter in instance methods to access instance variables and methods.",
+                    language: "Python"
+                },
+                {
+                    question: "Which of these is NOT a feature of Swift?",
+                    options: ["Automatic Reference Counting", "Optionals", "Garbage Collection", "Protocol-oriented programming"],
+                    answer: 2,
+                    explanation: "Swift uses Automatic Reference Counting (ARC) for memory management, not garbage collection. Garbage collection is a feature of languages like Java and C#.",
+                    language: "Swift"
+                },
+                {
+                    question: "What does the 'final' keyword do in Java?",
+                    options: ["Terminates a program", "Prevents inheritance", "Creates a constant", "All of the above"],
+                    answer: 3,
+                    explanation: "In Java, the 'final' keyword can be used to prevent inheritance (when applied to a class), prevent method overriding (when applied to a method), or create a constant (when applied to a variable).",
+                    language: "Java"
+                },
+                {
+                    question: "Who is known as the father of Java?",
+                    options: ["Dennis Ritchie", "James Gosling", "Guido van Rossum", "Bjarne Stroustrup"],
+                    answer: 1,
+                    explanation: "James Gosling created Java at Sun Microsystems in the mid-1990s.",
+                    language: "Java"
+                },
+                {
+                    question: "Which year was Java first released?",
+                    options: ["1991", "1995", "1999", "2001"],
+                    answer: 1,
+                    explanation: "Java was first released by Sun Microsystems in 1995.",
+                    language: "Java"
+                },
+                {
+                    question: "What does JVM stand for?",
+                    options: ["Java Variable Model", "Java Virtual Machine", "Joint Virtual Machine", "Java Verified Module"],
+                    answer: 1,
+                    explanation: "JVM stands for Java Virtual Machine, which runs Java bytecode on various platforms.",
+                    language: "Java"
+                },
+                {
+                    question: "What is the file extension for compiled Java files?",
+                    options: [".java", ".class", ".jar", ".exe"],
+                    answer: 1,
+                    explanation: "Compiled Java source files have the '.class' extension and contain bytecode.",
+                    language: "Java"
+                },
+                {
+                    question: "Which keyword is used to create a subclass in Java?",
+                    options: ["extends", "inherits", "subclass", "super"],
+                    answer: 0,
+                    explanation: "The 'extends' keyword is used to create a subclass and inherit from a superclass.",
+                    language: "Java"
+                },
+                {
+                    question: "Which of these is not a Java access modifier?",
+                    options: ["private", "protected", "sealed", "public"],
+                    answer: 2,
+                    explanation: "'sealed' is not a standard Java access modifier, though it may appear in some newer versions with specific usage.",
+                    language: "Java"
+                },
+                {
+                    question: "Which collection class allows key-value pairs in Java?",
+                    options: ["List", "Set", "Map", "Queue"],
+                    answer: 2,
+                    explanation: "Map is the Java interface used to store key-value pairs.",
+                    language: "Java"
+                },
+                {
+                    question: "What does the 'static' keyword signify in Java?",
+                    options: ["A variable that cannot change", "A method or variable that belongs to the class, not instances", "A final method", "A memory leak"],
+                    answer: 1,
+                    explanation: "The 'static' keyword means the field or method belongs to the class rather than instances.",
+                    language: "Java"
+                },
+                {
+                    question: "Which method is the entry point for a Java application?",
+                    options: ["start()", "main()", "init()", "run()"],
+                    answer: 1,
+                    explanation: "The 'main' method is the entry point for a Java application and must be defined as 'public static void main(String[] args)'.",
+                    language: "Java"
+                },
+                {
+                    question: "What is the purpose of the 'super' keyword in Java?",
+                    options: ["To call superclass constructors or methods", "To define a superclass", "To override a method", "To inherit static methods"],
+                    answer: 0,
+                    explanation: "The 'super' keyword is used to refer to the immediate parent class’s methods or constructor.",
+                    language: "Java"
+                },
+                {
+                    question: "Which Java keyword is used to handle exceptions?",
+                    options: ["try", "check", "throw", "except"],
+                    answer: 0,
+                    explanation: "'try' is used to define a block of code to test for exceptions, usually followed by 'catch'.",
+                    language: "Java"
+                },
+                {
+                    question: "Which of the following is a wrapper class in Java?",
+                    options: ["int", "Integer", "boolean", "char"],
+                    answer: 1,
+                    explanation: "Integer is a wrapper class for the primitive type int in Java.",
+                    language: "Java"
+                },
+                {
+                    question: "What is the output type of the expression '5 / 2' in Java?",
+                    options: ["2", "2.5", "2.0", "Error"],
+                    answer: 0,
+                    explanation: "Integer division in Java results in an integer, so 5 / 2 evaluates to 2.",
+                    language: "Java"
+                },
+                {
+                    question: "What does 'this' refer to in Java?",
+                    options: ["The parent class", "A static method", "The current object", "The main class"],
+                    answer: 2,
+                    explanation: "'this' refers to the current instance of the class.",
+                    language: "Java"
+                },
+                {
+                    question: "Which of these is not a primitive data type in Java?",
+                    options: ["int", "float", "boolean", "String"],
+                    answer: 3,
+                    explanation: "String is not a primitive type in Java; it is an object of the String class.",
+                    language: "Java"
+                },
+                {
+                    question: "Which Java keyword is used to inherit from a class?",
+                    options: ["implements", "extends", "inherits", "super"],
+                    answer: 1,
+                    explanation: "'extends' is used to inherit from a superclass in Java.",
+                    language: "Java"
+                },
+                {
+                    question: "Which Java keyword is used to implement an interface?",
+                    options: ["extends", "inherits", "implements", "interface"],
+                    answer: 2,
+                    explanation: "The 'implements' keyword is used when a class implements an interface.",
+                    language: "Java"
+                },
+                {
+                    question: "Which statement about Java is true?",
+                    options: ["Java is interpreted only", "Java is compiled to native machine code", "Java is compiled to bytecode and run on the JVM", "Java requires no compilation"],
+                    answer: 2,
+                    explanation: "Java source code is compiled to bytecode, which is executed by the Java Virtual Machine (JVM).",
+                    language: "Java"
+                },
+                {
+                    question: "Which feature allows Java to support multiple methods with the same name but different parameters?",
+                    options: ["Inheritance", "Overriding", "Polymorphism", "Overloading"],
+                    answer: 3,
+                    explanation: "Overloading in Java allows multiple methods with the same name but different parameter lists.",
+                    language: "Java"
+                },
+                {
+                    question: "Which company maintains PHP?",
+                    options: ["Facebook", "The PHP Group", "Oracle", "Microsoft"],
+                    answer: 1,
+                    explanation: "PHP is maintained by The PHP Group and the PHP Foundation. While it's open source, these organizations oversee its development and maintenance.",
+                    language: "PHP"
+                },
+                {
+                    question: "What does the 'using' statement do in C#?",
+                    options: ["Imports namespaces", "Ensures proper resource disposal", "Creates a new instance", "Both A and B"],
+                    answer: 3,
+                    explanation: "In C#, the 'using' statement has two purposes: importing namespaces (using System;) and ensuring proper disposal of resources that implement IDisposable (using (var resource = new Resource()) { ... }).",
+                    language: "C#"
+                },
+                {
+                    question: "What is the primary use of SQL's JOIN clause?",
+                    options: ["Filtering data", "Combining rows from different tables", "Sorting data", "Aggregating data"],
+                    answer: 1,
+                    explanation: "The primary purpose of SQL's JOIN clause is to combine rows from two or more tables based on a related column between them.",
+                    language: "SQL"
+                },
+                {
+                    question: "Which of these is NOT a primitive data type in JavaScript?",
+                    options: ["String", "Number", "Boolean", "Array"],
+                    answer: 3,
+                    explanation: "Array is not a primitive data type in JavaScript. The primitive data types are String, Number, Boolean, Null, Undefined, Symbol, and BigInt. Array is an object type.",
+                    language: "JavaScript"
+                },
+                {
+                    question: "What does the 'static' keyword mean in C++?",
+                    options: ["The variable cannot be modified", "The variable is shared among all instances of a class", "The variable is only accessible within its file", "The variable is allocated on the stack"],
+                    answer: 1,
+                    explanation: "In C++, when applied to a class member, the 'static' keyword means the member is shared among all instances of the class, rather than being unique to each instance.",
+                    language: "C++"
+                },
+                {
+                    question: "Which of these is NOT a valid loop in Visual Basic?",
+                    options: ["For...Next", "Do...Loop", "While...Wend", "Repeat...Until"],
+                    answer: 3,
+                    explanation: "Repeat...Until is not a valid loop construct in Visual Basic. The valid loop constructs are For...Next, Do...Loop, and While...Wend (in older versions) or While...End While (in newer versions).",
+                    language: "Visual Basic"
+                }
+            ];
+            
+            // Get unique languages from question bank
+            const languages = [...new Set(questionBank.map(q => q.language))].sort();
+            
+            // Local storage functions
+            const storage = {
+                getBadges: function() {
+                    const badges = localStorage.getItem('codeQuestBadges');
+                    return badges ? JSON.parse(badges) : {};
+                },
+                
+                saveBadge: function(language) {
+                    const badges = this.getBadges();
+                    badges[language] = {
+                        earned: true,
+                        date: new Date().toISOString()
+                    };
+                    localStorage.setItem('codeQuestBadges', JSON.stringify(badges));
+                    this.updateBadgeCount();
+                    this.checkMasterAchievement();
+                },
+                
+                updateBadgeCount: function() {
+                    const badges = this.getBadges();
+                    const count = Object.keys(badges).length;
+                    badgesCountEl.textContent = count;
+                },
+                
+                checkMasterAchievement: function() {
+                    const badges = this.getBadges();
+                    const earnedLanguages = Object.keys(badges);
+                    
+                    if (earnedLanguages.length === languages.length) {
+                        localStorage.setItem('codeQuestMaster', new Date().toISOString());
+                    }
+                },
+                
+                hasMasterAchievement: function() {
+                    return localStorage.getItem('codeQuestMaster') !== null;
+                },
+                
+                getMasterDate: function() {
+                    return localStorage.getItem('codeQuestMaster');
+                }
+            };
+            
+            // Initialize badges count
+            storage.updateBadgeCount();
+            
+            // Tab navigation
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all buttons
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    button.classList.add('active');
+                    
+                    // Hide all tab contents
+                    tabContents.forEach(content => content.classList.add('hidden'));
+                    
+                    // Show the selected tab content
+                    const tabId = button.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-tab`).classList.remove('hidden');
+                    
+                    // If languages tab, populate language cards
+                    if (tabId === 'languages') {
+                        populateLanguageCards();
+                    }
+                    
+                    // If badges tab, populate badges
+                    if (tabId === 'badges') {
+                        populateBadges();
+                    }
+                });
+            });
+            
+            // Back to home buttons
+            backToHomeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    showTab('home');
+                });
+            });
+            
+            // Show tab helper function
+            function showTab(tabId) {
+                tabButtons.forEach(btn => {
+                    if (btn.getAttribute('data-tab') === tabId) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+                
+                tabContents.forEach(content => content.classList.add('hidden'));
+                document.getElementById(`${tabId}-tab`).classList.remove('hidden');
+                
+                if (tabId === 'languages') {
+                    populateLanguageCards();
+                }
+                
+                if (tabId === 'badges') {
+                    populateBadges();
+                }
+            }
+            
+            // Populate language cards
+            function populateLanguageCards() {
+                const languageCardsContainer = document.querySelector('#languages-tab .grid');
+                languageCardsContainer.innerHTML = '';
+                
+                languages.forEach(language => {
+                    const languageInfo = languageIcons[language] || languageIcons['General'];
+                    const badges = storage.getBadges();
+                    const hasBadge = badges[language] ? true : false;
+                    
+                    const card = document.createElement('div');
+                    card.className = `language-card quiz-card p-4 rounded-xl text-center ${hasBadge ? 'border-2 border-green-500' : ''}`;
+                    card.setAttribute('data-language', language);
+                    
+                    card.innerHTML = `
+                        <div class="flex justify-center mb-3">
+                            <div class="language-icon ${languageInfo.color} text-white text-2xl">
+                                ${languageInfo.emoji}
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-bold mb-1">${language}</h3>
+                        <p class="text-sm text-gray-400 mb-2">${getQuestionCountForLanguage(language)} questions</p>
+                        ${hasBadge ? '<span class="inline-block px-2 py-1 bg-green-500 text-white text-xs rounded-full">Badge Earned</span>' : ''}
+                    `;
+                    
+                    card.addEventListener('click', () => {
+                        // Remove selected class from all cards
+                        document.querySelectorAll('.language-card').forEach(c => c.classList.remove('selected'));
+                        
+                        // Add selected class to clicked card
+                        card.classList.add('selected');
+                        
+                        // Enable start quiz button
+                        startQuizBtn.disabled = false;
+                        startQuizBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        
+                        // Set selected language
+                        selectedLanguage = language;
+                    });
+                    
+                    languageCardsContainer.appendChild(card);
+                });
+            }
+            
+            // Get question count for a language
+            function getQuestionCountForLanguage(language) {
+                return questionBank.filter(q => q.language === language).length;
+            }
+            
+            // Populate badges
+            function populateBadges() {
+                const badgesContainer = document.getElementById('badges-container');
+                badgesContainer.innerHTML = '';
+                
+                const badges = storage.getBadges();
+                const earnedLanguages = Object.keys(badges);
+                
+                languages.forEach(language => {
+                    const languageInfo = languageIcons[language] || languageIcons['General'];
+                    const hasBadge = earnedLanguages.includes(language);
+                    
+                    const badgeElement = document.createElement('div');
+                    badgeElement.className = `text-center ${hasBadge ? 'badge-earned' : 'badge-locked'}`;
+                    
+                    badgeElement.innerHTML = `
+                        <div class="achievement-badge inline-block p-4 rounded-xl bg-gray-800/50 mb-2">
+                            <div class="text-3xl mb-2">${languageInfo.emoji}</div>
+                            <div class="text-sm font-bold mb-1 ${hasBadge ? `text-transparent bg-clip-text bg-gradient-to-r ${languageInfo.gradient}` : 'text-gray-400'}">
+                                ${language}
+                            </div>
+                            ${hasBadge ? `<div class="text-xs text-gray-400">${formatDate(badges[language].date)}</div>` : ''}
+                        </div>
+                    `;
+                    
+                    badgesContainer.appendChild(badgeElement);
+                });
+                
+                // Check for master achievement
+                const masterBadgeContainer = document.getElementById('master-badge-container');
+                if (storage.hasMasterAchievement()) {
+                    masterBadgeContainer.classList.remove('hidden');
+                    certificateDateEl.textContent = formatDate(storage.getMasterDate());
+                } else {
+                    masterBadgeContainer.classList.add('hidden');
+                }
+            }
+            
+            // Format date helper
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString();
+            }
+            
+            // Initialize quiz
+            function initQuiz() {
+                // Reset state
+                currentQuestion = 0;
+                score = 0;
+                scoreEl.textContent = score;
+                
+                // Get questions for selected language
+                const languageQuestions = questionBank.filter(q => q.language === selectedLanguage);
+                
+                // Select random questions from the language
+                selectedQuestions = getRandomQuestions(languageQuestions, Math.min(questionsPerGame, languageQuestions.length));
+                
+                totalQuestionsEl.textContent = selectedQuestions.length;
+                maxScoreEl.textContent = selectedQuestions.length;
+                currentLanguageEl.textContent = selectedLanguage;
+                resultsLanguageEl.textContent = `${selectedLanguage} • Your final score:`;
+                
+                // Clear feedback
+                feedbackEl.classList.add('hidden');
+                nextBtn.classList.add('hidden');
+            }
+            
+            // Get random questions
+            function getRandomQuestions(questions, count) {
+                const shuffled = [...questions].sort(() => 0.5 - Math.random());
+                return shuffled.slice(0, count);
+            }
+            
+            // Start button click - show languages tab
+            startBtn.addEventListener('click', () => {
+                showTab('languages');
+            });
+            
+            // Start quiz button click
+            startQuizBtn.addEventListener('click', () => {
+                if (selectedLanguage) {
+                    initQuiz();
+                    startScreen.classList.add('hidden');
+                    quizScreen.classList.remove('hidden');
+                    loadQuestion();
+                }
+            });
+            
+            // Next question
+            nextBtn.addEventListener('click', () => {
+                currentQuestion++;
+                if (currentQuestion < selectedQuestions.length) {
+                    loadQuestion();
+                    nextBtn.classList.add('hidden');
+                    feedbackEl.classList.add('hidden');
+                } else {
+                    showResults();
+                }
+            });
+            
+            // Retry quiz
+            retryBtn.addEventListener('click', () => {
+                initQuiz();
+                resultsScreen.classList.add('hidden');
+                quizScreen.classList.remove('hidden');
+                loadQuestion();
+            });
+            
+            // Choose another language
+            chooseLanguageBtn.addEventListener('click', () => {
+                resultsScreen.classList.add('hidden');
+                startScreen.classList.remove('hidden');
+                showTab('languages');
+            });
+            
+            // View badges
+            viewBadgesBtn.addEventListener('click', () => {
+                resultsScreen.classList.add('hidden');
+                startScreen.classList.remove('hidden');
+                showTab('badges');
+            });
+            
+            // View certificate
+            viewCertificateBtn.addEventListener('click', () => {
+                resultsScreen.classList.add('hidden');
+                startScreen.classList.remove('hidden');
+                showTab('badges');
+            });
+            
+            // Load question
+            function loadQuestion() {
+                const question = selectedQuestions[currentQuestion];
+                
+                // Create language badge
+                const languageInfo = languageIcons[question.language] || languageIcons['General'];
+                
+                // Update question with language badge
+                questionContainer.innerHTML = `
+                    <div class="flex items-center mb-4">
+                        <div class="language-icon ${languageInfo.color} text-white">
+                            ${languageInfo.emoji}
+                        </div>
+                        <span class="text-sm font-medium text-gray-400">About ${question.language}</span>
+                    </div>
+                    <h2 id="question" class="text-xl md:text-2xl font-semibold">${question.question}</h2>
+                `;
+                
+                // Update progress
+                currentQuestionEl.textContent = currentQuestion + 1;
+                const progressPercentage = ((currentQuestion + 1) / selectedQuestions.length) * 100;
+                progressFill.style.width = `${progressPercentage}%`;
+                
+                // Clear previous options
+                optionsEl.innerHTML = '';
+                
+                // Add options
+                question.options.forEach((option, index) => {
+                    const button = document.createElement('button');
+                    button.className = 'option-btn w-full text-left p-4 rounded-xl flex items-center transition-all duration-300';
+                    button.innerHTML = `
+                        <span class="inline-block w-8 h-8 mr-3 text-center leading-8 bg-gray-700 rounded-full">${String.fromCharCode(65 + index)}</span>
+                        <span>${option}</span>
+                    `;
+                    
+                    button.addEventListener('click', () => selectAnswer(index));
+                    optionsEl.appendChild(button);
+                });
+            }
+            
+            // Select answer
+            function selectAnswer(selectedIndex) {
+                const question = selectedQuestions[currentQuestion];
+                const options = document.querySelectorAll('.option-btn');
+                
+                // Disable all options
+                options.forEach(option => {
+                    option.classList.add('disabled');
+                });
+                
+                // Show correct and incorrect answers
+                options[question.answer].classList.add('correct');
+                
+                if (selectedIndex !== question.answer) {
+                    options[selectedIndex].classList.add('incorrect');
+                    feedbackEl.innerHTML = `<p class="font-semibold text-red-400">Incorrect!</p><p>${question.explanation}</p>`;
+                    feedbackEl.className = 'mb-6 p-4 rounded-lg bg-red-900/30 border border-red-700';
+                } else {
+                    score++;
+                    scoreEl.textContent = score;
+                    feedbackEl.innerHTML = `<p class="font-semibold text-green-400">Correct!</p><p>${question.explanation}</p>`;
+                    feedbackEl.className = 'mb-6 p-4 rounded-lg bg-green-900/30 border border-green-700';
+                    createConfetti();
+                }
+                
+                feedbackEl.classList.remove('hidden');
+                nextBtn.classList.remove('hidden');
+            }
+            
+            // Show results
+            function showResults() {
+                quizScreen.classList.add('hidden');
+                resultsScreen.classList.remove('hidden');
+                finalScoreEl.textContent = score;
+                
+                // Determine achievement
+                let achievement, achievementColor, achievementIcon;
+                const percentage = (score / selectedQuestions.length) * 100;
+                
+                if (percentage === 100) {
+                    achievement = "Perfect Score!";
+                    achievementColor = "from-yellow-300 to-amber-500";
+                    achievementIcon = "🏆";
+                    
+                    // Save badge for perfect score
+                    storage.saveBadge(selectedLanguage);
+                    
+                    // Show badge earned
+                    const languageInfo = languageIcons[selectedLanguage] || languageIcons['General'];
+                    badgeEarned.innerHTML = `
+                        <div class="achievement-badge inline-block p-6 rounded-2xl bg-gray-800/50 badge-glow">
+                            <div class="text-5xl mb-3">${languageInfo.emoji}</div>
+                            <div class="text-2xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r ${languageInfo.gradient}">
+                                ${selectedLanguage} Master
+                            </div>
+                        </div>
+                    `;
+                    badgeEarnedContainer.classList.remove('hidden');
+                    
+                    // Check if all badges are earned
+                    if (storage.hasMasterAchievement()) {
+                        masterAchievementContainer.classList.remove('hidden');
+                    } else {
+                        masterAchievementContainer.classList.add('hidden');
+                    }
+                    
+                    createConfetti();
+                } else if (percentage >= 80) {
+                    achievement = "Great Job!";
+                    achievementColor = "from-purple-400 to-purple-600";
+                    achievementIcon = "⚔️";
+                    badgeEarnedContainer.classList.add('hidden');
+                    masterAchievementContainer.classList.add('hidden');
+                } else if (percentage >= 60) {
+                    achievement = "Good Work!";
+                    achievementColor = "from-blue-400 to-blue-600";
+                    achievementIcon = "🛡️";
+                    badgeEarnedContainer.classList.add('hidden');
+                    masterAchievementContainer.classList.add('hidden');
+                } else if (percentage >= 40) {
+                    achievement = "Nice Try!";
+                    achievementColor = "from-green-400 to-green-600";
+                    achievementIcon = "📚";
+                    badgeEarnedContainer.classList.add('hidden');
+                    masterAchievementContainer.classList.add('hidden');
+                } else {
+                    achievement = "Keep Learning!";
+                    achievementColor = "from-gray-400 to-gray-600";
+                    achievementIcon = "🔍";
+                    badgeEarnedContainer.classList.add('hidden');
+                    masterAchievementContainer.classList.add('hidden');
+                }
+                
+                achievementEl.innerHTML = `
+                    <div class="achievement-badge inline-block p-6 rounded-2xl bg-gray-800/50">
+                        <div class="text-5xl mb-3">${achievementIcon}</div>
+                        <div class="text-2xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r ${achievementColor}">
+                            ${achievement}
+                        </div>
+                        <p class="text-sm text-gray-400">
+                            ${getAchievementMessage(percentage)}
+                        </p>
+                    </div>
+                `;
+            }
+            
+            function getAchievementMessage(percentage) {
+                if (percentage === 100) {
+                    return `You've mastered ${selectedLanguage}!`;
+                } else if (percentage >= 80) {
+                    return `You have strong knowledge of ${selectedLanguage}!`;
+                } else if (percentage >= 60) {
+                    return `You have good understanding of ${selectedLanguage}!`;
+                } else if (percentage >= 40) {
+                    return `You're on your way to learning ${selectedLanguage}!`;
+                } else {
+                    return `Keep practicing ${selectedLanguage}!`;
+                }
+            }
+            
+            // Create confetti effect
+            function createConfetti() {
+                const confettiCount = 100;
+                const container = document.body;
+                
+                for (let i = 0; i < confettiCount; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    
+                    // Random position
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    
+                    // Random color
+                    const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b'];
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    // Random shape
+                    const shapes = ['circle', 'square', 'triangle'];
+                    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+                    
+                    if (shape === 'circle') {
+                        confetti.style.borderRadius = '50%';
+                    } else if (shape === 'triangle') {
+                        confetti.style.width = '0';
+                        confetti.style.height = '0';
+                        confetti.style.backgroundColor = 'transparent';
+                        confetti.style.borderLeft = '5px solid transparent';
+                        confetti.style.borderRight = '5px solid transparent';
+                        confetti.style.borderBottom = '10px solid ' + colors[Math.floor(Math.random() * colors.length)];
+                    }
+                    
+                    // Animation
+                    confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+                    
+                    container.appendChild(confetti);
+                    
+                    // Remove after animation
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 5000);
+                }
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'94843e08c0ff4a6e',t:'MTc0ODY3MTEzNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
